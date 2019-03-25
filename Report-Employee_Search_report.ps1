@@ -1,0 +1,1 @@
+﻿Get-Aduser -filter * -SearchBase "OU=TMS Users,OU=HQ,DC=excelsior,DC=local" -Properties Name, employeeID, SamAccountName, UserPrincipalName, DistinguishedName | Select Name, employeeID, SamAccountName, UserPrincipalName, DistinguishedName #| Export-csv C:\CSV\TMS-Users.csv 

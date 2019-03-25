@@ -1,0 +1,1 @@
+﻿$UpdateCSV | ForEach {Set-MsolUser -UserPrincipalName $_.EMAIL_ADDRESS -FirstName $_.First_Name -LastName $_.Last_Name -Title $_.Title -Office $_.Office -PhoneNumber $_.Office_Phone -StreetAddress $_.Street_address -City $_.City -State $_.State -PostalCode $_.ZIP -Country $_.Country}

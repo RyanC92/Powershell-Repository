@@ -1,0 +1,1 @@
+﻿Get-Aduser -filter * -SearchBase "OU=Users,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=excelsior,DC=local" -Properties * | Export-CSV C:\CSV\SomeCSV.CSV

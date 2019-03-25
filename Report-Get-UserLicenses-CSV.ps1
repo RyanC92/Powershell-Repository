@@ -1,0 +1,1 @@
+﻿Get-msoluser -all | where {$_.isLicensed -eq "true" } | select-object -property DisplayName, userprincipalname, @{name="licenses";expression={$_.licenses.accountskuid}} | Export-CSV "C:\CSV\Users and Licenses1.csv"

@@ -1,0 +1,1 @@
+﻿Get-Mailbox -ResultSize Unlimited | ForEach {Get-MailboxDeviceStatistics -Mailbox $mailbox.samaccountname}
