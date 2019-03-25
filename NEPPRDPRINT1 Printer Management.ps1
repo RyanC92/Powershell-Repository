@@ -31,6 +31,7 @@ if ($Building -eq "1" -or "1919"){
     }elseif($Printer -eq "2" -or "NEPPRINTER101" -or "NEPPRINTER101 - Optrel Room" -or "Optrel Room"){
         rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
         rundll32 printui.dll,PrintUIEntry /ga  /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+    
     }
    
     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Color"
@@ -52,8 +53,19 @@ if ($Building -eq "1" -or "1919"){
     if($Printer -eq "1" -or "NEPPRINTER01" ){
         rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
         rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
-    }elseif($Printer -eq "2" -or "NEPPRINTER101" ){
-        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+    }elseif($Printer -eq "2" -or "NEPPRINTER10" ){
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Black & White"
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Color"
+    }elseif($Printer -eq "3" -or "NEPPRINTER13"){
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER13 - Abraham Montealegre - Black & White"
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"NEPPRINTER13 - Abraham Montealegre - Color"
+    }elseif($Printer -eq "4" -or "NEPPRINTER22"){
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Black & White"
+        rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Color"
+    }elseif($Printer -eq "5" -or "NEPPRINTER30"){
+
+        
+    }
     }
 }
 
