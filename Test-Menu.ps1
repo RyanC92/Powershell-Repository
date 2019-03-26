@@ -34,3 +34,4 @@ do
     }
     pause
 }
+until ($input -eq 'q')
