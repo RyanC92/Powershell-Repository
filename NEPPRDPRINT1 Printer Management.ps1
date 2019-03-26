@@ -69,7 +69,7 @@ if ($Building -eq "1" -or "1919"){
 }
 
 
-if($Building -eq "Xerox"){
+if($Building -eq "Xerox" -or "5"){
 
     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER04 - 1933 Supervisors Office - Black & White"
     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER04 - 1933 Supervisors Office - Color"
