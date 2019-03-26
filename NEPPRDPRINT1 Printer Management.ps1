@@ -64,10 +64,10 @@ if ($Building -eq "1" -or "1919"){
         rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Color"
     }elseif($Printer -eq "5" -or "NEPPRINTER30"){
 
-        
-    }
+
     }
 }
+
 
 if($Building -eq "Xerox"){
 
