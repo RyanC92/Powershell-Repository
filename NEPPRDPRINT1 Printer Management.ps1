@@ -18,14 +18,28 @@ $Building = Read-Host "Which Building? Type either the number (1. 2. 3. 4. 5. or
 Choice"
 
 switch ($Building) {
-    1 {    Write-Host "Available Printers: `n
+    '1' {    Write-Host "Available Printers: `n
         1. NEPPRINTER12 - Facilities `n
         2. NEPPRINTER101 - Optrel Room `n"
-    bld1919
+        $Printer = Read-Host "Which Printer Do you want to Install? `n
+        `n
+        Printer"
+    
+            switch ($printer) {
+                '1'{
+                    rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
+                    rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
+                }
+                '2'{
+                    rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+                    rundll32 printui.dll,PrintUIEntry /ga  /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+                }
+            }
+    }
 
     }
 
-    2 {     Write-Host "Available Printers: `n
+    '2' {     Write-Host "Available Printers: `n
         1. NEPPRINTER01 - 1923 Supervisors Area `n
         2. NEPPRINTER10 - Miurel Laguna `n
         3. NEPPRINTER13 - Abraham Montealegre `n
@@ -38,23 +52,23 @@ switch ($Building) {
         Printer"
 
             switch ($Printer) {
-                1{
+                '1'{
                     rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
                     rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
                 }
-                2{ 
+                '2'{ 
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Black & White"
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Color"
                 }
-                3{
+                '3'{
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER13 - Abraham Montealegre - Black & White"
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"NEPPRINTER13 - Abraham Montealegre - Color"
                 }
-                4{
+                '4'{
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Black & White"
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Color"
                 }
-                5{
+                '5'{
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Black & White"
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER22 - AQL Office - Color"  
 
@@ -141,20 +155,20 @@ rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Black
 
 
 
-function bld1919(){
+<#function bld1919(){
 
     $Printer = Read-Host "Which Printer Do you want to Install? `n
     `n
     Printer"
 
         switch ($printer) {
-            1{
+            '1'{
                 rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
                 rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
             }
-            2{
+            '2{
                 rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
                 rundll32 printui.dll,PrintUIEntry /ga  /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
             }
         }
-}
+}#>
