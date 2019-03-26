@@ -21,20 +21,7 @@ switch ($Building) {
     1 {    Write-Host "Available Printers: `n
         1. NEPPRINTER12 - Facilities `n
         2. NEPPRINTER101 - Optrel Room `n"
-        $Printer = Read-Host "Which Printer Do you want to Install? `n
-        `n
-        Printer"
-
-            switch ($printer) {
-                1{
-                    rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
-                    rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
-                }
-                2{
-                    rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
-                    rundll32 printui.dll,PrintUIEntry /ga  /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
-                }
-            }
+    bld1919
 
     }
 
@@ -53,7 +40,7 @@ switch ($Building) {
             switch ($Printer) {
                 1{
                     rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
-                    rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
+                    rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
                 }
                 2{ 
                     rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Black & White"
@@ -113,7 +100,7 @@ if ($Building -eq "1" -or "1919"){
     Printer"
     if($Printer -eq "1" -or "NEPPRINTER01" ){
         rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
-        rundll32 printui.dll,PrintUIEntry /in /ga /y /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
+        rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
     }elseif($Printer -eq "2" -or "NEPPRINTER10" ){
         rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Black & White"
         rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER10 - Color"
@@ -148,3 +135,26 @@ if ($Building -eq "1" -or "1919"){
 
 rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Color"
 rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Black & White"
+
+
+
+
+
+
+function bld1919(){
+
+    $Printer = Read-Host "Which Printer Do you want to Install? `n
+    `n
+    Printer"
+
+        switch ($printer) {
+            1{
+                rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Black & White"
+                rundll32 printui.dll,PrintUIEntry /in /ga /n "\\NEPPRDPRINT1\NEPPRINTER12 - Facilities - Color"
+            }
+            2{
+                rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+                rundll32 printui.dll,PrintUIEntry /ga  /n"\\NEPPRDPRINT1\NEPPRINTER101 - Optrel Room - Black & White"
+            }
+        }
+}
