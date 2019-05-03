@@ -1,3 +1,5 @@
+import-module activedirectory
+
 Function Connect-ExOnline{
 
 $Credential = Get-Credential -Credential Rcurran@excelsiormedical.com
