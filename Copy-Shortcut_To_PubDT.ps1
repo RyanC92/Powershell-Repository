@@ -10,16 +10,30 @@ Function Get-FileName($InitialDirectory)
   $OpenFileDialog.ShowDialog() | Out-Null
   $OpenFileDialog.FileName
 }
+Function Get-FolderName($InitialDirectory)
+{
+    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
+
+  $OpenFolderDialog = New-Object System.Windows.Forms.FolderBrowserDialog
+  #$OpenFolderDialog.initialDirectory = $initialDirectory
+  #$OpenFileDialog.filter = "CSV (*.csv) | *.csv"
+  $OpenFolderDialog.ShowDialog() | Out-Null
+  $OpenFolderDialog.SelectedPath
+}
 
 
 Write-Host "Select the Shortcut to Transfer"
-$Shortcut = Get-FileName
+$Shortcut = Get-FolderName
 
 Write-host "Select the List of Computers to transfer the shortcut to"
 $Comps = Get-FileName
 
-$SC = "$Shortcut"
-$PCS = Import-CSV "$Comps"
+$SC = $Shortcut
+$PCS = Import-CSV $Comps
 
 
-Copy-item $SC "\\$PCS.Hostname\C$\Users\Public\Desktop"
+ForEach ($PC in $PCS){
+
+
+  xcopy $SC \\$PC\C$\Users\Public\Desktop
+}
