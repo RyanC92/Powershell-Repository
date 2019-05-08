@@ -13,9 +13,6 @@ Function Get-FileName($InitialDirectory)
 
 $Path = Get-FileName
 
+$IPath = Import-CSV "$Path"
 
-
-
-$Users = Import-CSV "$Path"
-
-$Users
+$IPath
