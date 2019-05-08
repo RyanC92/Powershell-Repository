@@ -6,7 +6,7 @@ Function Get-FileName($InitialDirectory)
 
   $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
   $OpenFileDialog.initialDirectory = $initialDirectory
-  $OpenFileDialog.filter = "*"
+  #$OpenFileDialog.filter = "CSV (*.csv) | *.csv"
   $OpenFileDialog.ShowDialog() | Out-Null
   $OpenFileDialog.FileName
 }
