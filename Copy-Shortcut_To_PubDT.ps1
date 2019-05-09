@@ -35,7 +35,7 @@ $PCS = Import-CSV $Comps
 $SC
 
 ForEach ($PC in $PCS){
-
+  Write-host "Copying to $($PC.Hostname)"
   xcopy $SC "\\$($PC.Hostname)\C$\Users\Public\Desktop"
 
 }
