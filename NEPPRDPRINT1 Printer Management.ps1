@@ -6,7 +6,16 @@ By: Ryan Curran
 
 
 Write-host "Below, type the following options to install the printers. All printers are Globally added with the /ga  parameter"
-Write-Host "Type Xerox at any time to Skip everything and Install or Uninstall all Xerox Printers"
+Write-Host "Type Xerox at any time to Skip everything and Install or Uninstall all Xerox Printers `n"
+
+$LoclRmt = Read-Host "Is this computer local or remote? (Enter L for Local R for Remote)"
+$HNL = hostname
+
+if($LoclRmt -eq "R"){
+
+    $HNR = Read-Host "Enter the Hostname of the computer (Example: NEP123456)"
+
+}
 
 $Building = Read-Host "Which Building? Type either the number (1. 2. 3. 4. 5. or The building number (1919, 1923, 1930 or 1933) or Xerox `n 
 1. 1919 `n
@@ -18,7 +27,8 @@ $Building = Read-Host "Which Building? Type either the number (1. 2. 3. 4. 5. or
 Choice"
 
 switch ($Building) {
-    '1' {    Write-Host "Available Printers: `n
+    { ($_ -eq '1') -or ($_ -eq "1919")} {    
+        Write-Host "Available Printers: `n
         1. NEPPRINTER12 - Facilities `n
         2. NEPPRINTER101 - Optrel Room `n"
         $Printer = Read-Host "Which Printer Do you want to Install? `n
@@ -37,9 +47,10 @@ switch ($Building) {
             }
     }
 
-    }
+    
 
-    '2' {     Write-Host "Available Printers: `n
+    '2' {     
+        Write-Host "Available Printers: `n
         1. NEPPRINTER01 - 1923 Supervisors Area `n
         2. NEPPRINTER10 - Miurel Laguna `n
         3. NEPPRINTER13 - Abraham Montealegre `n
@@ -75,7 +86,11 @@ switch ($Building) {
                 }
             }
 
-    }  
+    }
+    default  { 
+        "No Selection Made."
+        Return 
+}  
 } 
 
 <#
@@ -150,8 +165,16 @@ if ($Building -eq "1" -or "1919"){
 rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Color"
 rundll32 printui.dll,PrintUIEntry /in /ga /n"\\NEPPRDPRINT1\Secure Print - Black & White"
 
+#Local computer
+
+$RSpool = Read-Host "Restart Spooler?"
 
 
+
+if($Rspool -eq "yes" -or "Y"){
+
+
+}
 
 
 
