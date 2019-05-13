@@ -12,21 +12,28 @@ Function Get-FileName($InitialDirectory)
 
 $RoleList = Get-FileName
 
-$AllRoles = @()
+#$AllRoles = @()
 
 $RL = Import-csv $RoleList
 
 ForEach($User in $RL){
 
+    Get-Adgroupmember -Identity  $User.Role | select @{Expression = {$User.Role}; Label = "Role"},Name,SamAccountName 
+
+}
+
+<#
+
     $EndUsers = Get-AdgroupMember -Identity $($User.Role) | Select Name, SamAccountName
 
     $AllRoles += [pscustomobject]@{
 
-        Role = $($User.Role)
-        User = $($EndUsers.Name)
+        "Role" = $User.Role
+        "User" = $($EndUsers.Name)
+        "Username" = $($Endusers.SamAccountName)
+
         
     }
 
-}
-
-$AllRoles | Export-CSV C:\CSV\MemberCount-$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -append -NoTypeinformation
+    $AllRoles #| Export-CSV C:\CSV\MemberCount-$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -append -NoTypeinformation
+#>
