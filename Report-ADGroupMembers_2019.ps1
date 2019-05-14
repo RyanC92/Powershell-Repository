@@ -18,7 +18,8 @@ $RL = Import-csv $RoleList
 
 ForEach($User in $RL){
 
-    Get-Adgroupmember -Identity  $User.Role | select @{Expression = {$User.Role}; Label = "Role"},Name,SamAccountName 
+    Get-Adgroupmember -Identity  $User.Role | select @{Expression = {$User.Role}; Label = "Role"},Name,SamAccountName | Export-CSV C:\CSV\MemberCount-$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -append -NoTypeinformation
+    
 
 }
 
