@@ -10,9 +10,9 @@ $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem |
 
 
 New-Object -Typename PSCustomObject -Property @{
-    UserName = $UName
-    Hostname = $HN
-    OS = $OS
+    "UserName" = $($UName.Username)
+    "Hostname" = $($HN.PSComputername)
+    "OS" = $($OS.Caption)
 
 
 }   | Export-csv -Path C:\CSV\UserInfo.csv -NoTypeInformation -Append

@@ -10,10 +10,10 @@ Write-host "Attempting to lookup" $Nodes.Hostname
         $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem | Select-Object Caption
 
         $properties = @{
-            UserName = $UName
-            Hostname = $HN
-            OS = $OS
-            NotFound = $null
+            "UserName" = $($UName.Username)
+            "Hostname" = $($HN.PSComputerName)
+            "OS" = $($OS.Caption)
+            "NotFound" = $null
         }
 
         New-Object -Typename PSCustomObject -Property $properties
@@ -21,10 +21,10 @@ Write-host "Attempting to lookup" $Nodes.Hostname
 
     catch {
         $properties = @{
-            Username = $null
-            Hostname = $null
-            OS = $null
-            NotFound = $nodes
+            "Username" = $null
+            "Hostname" = $null
+            "OS" = $null
+            "NotFound" = $($nodes.Hostname)
 
         }
 
