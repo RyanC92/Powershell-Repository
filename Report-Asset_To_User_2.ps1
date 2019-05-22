@@ -5,9 +5,12 @@ $Collection = ForEach ($nodes in $node) {
 Write-host "Attempting to lookup" $Nodes.Hostname
 
     try {
-        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object UserName
-        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object PSComputerName
-        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem -ErrorAction Stop | Select-Object Caption
+		
+		Test-Connection $($Hns.Hostname) -quiet -Count 1 -ErrorAction Stop
+
+        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object UserName
+        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object PSComputerName
+        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem | Select-Object Caption
         
         $properties = @{
             "UserName" = $($UName.Username)
@@ -20,7 +23,8 @@ Write-host "Attempting to lookup" $Nodes.Hostname
     }
 
     catch [System.Exception] {
-        $nodes
+
+        Write-host "$($nodes.hostname) has failed"
 
         $($nodes.hostname) | Export-csv C:\CSV\Error$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -append -NoTypeInformation
        
