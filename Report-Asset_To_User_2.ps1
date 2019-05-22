@@ -5,10 +5,10 @@ $Collection = ForEach ($nodes in $node) {
 Write-host "Attempting to lookup" $Nodes.Hostname
 
     try {
-        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object UserName
-        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object PSComputerName
-        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem | Select-Object Caption
-
+        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object UserName
+        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object PSComputerName
+        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem -ErrorAction Stop | Select-Object Caption
+        
         $properties = @{
             "UserName" = $($UName.Username)
             "Hostname" = $($HN.PSComputerName)
@@ -19,19 +19,14 @@ Write-host "Attempting to lookup" $Nodes.Hostname
         New-Object -Typename PSCustomObject -Property $properties
     }
 
-    catch {
-        $properties = @{
-            "Username" = $null
-            "Hostname" = $null
-            "OS" = $null
-            "NotFound" = $($nodes.Hostname)
+    catch [System.Exception] {
+        $nodes
 
-        }
-
-        New-Object -TypeName PSObject -Property $properties
+        $($nodes.hostname) | Export-csv C:\CSV\Error$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -append -NoTypeInformation
+       
 
     }
 
 }
 
-$collection | Export-csv C:\CSV\UserInfo.csv -NoTypeInformation -Append
+$collection | Export-csv C:\CSV\UserInfo$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -NoTypeInformation -Append
