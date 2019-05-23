@@ -34,8 +34,14 @@ $PCS = Import-CSV $Comps
 
 $SC
 
-ForEach ($PC in $PCS){
+<#ForEach ($PC in $PCS){
   Write-host "Copying to $($PC.Hostname)"
   xcopy $SC "\\$($PC.Hostname)\C$\Users\Public\Desktop"
+
+}#>
+
+ForEach($PC in $PCs){
+  Write-Host "Copying to $($PC.Hostname)"
+  xcopy $SC "\\$($PC.Hostname)\C$\ProgramData\Microsoft\Windows\Start Menu\"
 
 }

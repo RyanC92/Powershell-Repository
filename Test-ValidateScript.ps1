@@ -1,20 +1,17 @@
 $HN = Import-csv C:\csv\Hosts.csv
 
     ForEach($HNs in $HN){
-
-        [ValidateScript({Test-Connection -ComputerName $($HNs.Hostname) -Quiet -Count 1})]
-        [ValidateNotNullOrEmpty()]
-        [string[]]$ComputerName = $Env:COMPUTERNAME
-        
-
-        <#ForEach ($Comp in $ComputerName){
+     
+            $tF = Test-Connection $($Hns.Hostname) -quiet -Count 1 -ErrorAction Stop
             
-            {
-                $output = @{ 'ComputerName' = $comp }
-                $output.UserName = (Get-WmiObject -Class win32_computersystem -ComputerName $comp).UserName
-                [PSCustomObject]$output
-            }
+            if ($tF -eq $True){
+                
+                #Write code to execute
+                $Hns.Hostname
 
-        }#>
+            }else {
+                #Export your hostnames that failed the ping
+                $Hns.Hostname | Export-csv C:\CSV\Failures.csv -append notypeinformation
+            }
 
     }
