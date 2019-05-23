@@ -59,8 +59,8 @@ ForEach($PC in $PCs){
       PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
     #>
     }else{
-      Write-Host "$($PC.Hostname) Failed" -ForegroundColor Red 
-      $PC.Hostname | Out-File C:\CSV\FailedHostnames.csv -Append
+      Write-Host "$($PC.Hostname) Is Unavailable" -ForegroundColor Red 
+      $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append
 
     }
   
