@@ -24,39 +24,48 @@ Function Get-FolderName($InitialDirectory)
 
 $i = 0
 
+
 Write-Host "Select the Shortcut to Transfer" -ForegroundColor Green
-$Shortcut = Get-FileName
+#Use Function to Get the File to transfer
+$FileToTransfer = Get-FileName
 
 Write-host "Select the List of Computers to transfer the shortcut to" -ForegroundColor Green
+#Use Function to Get the CSV list of Computers
 $Comps = Get-FileName
 
-$XML = $Shortcut
+
+#Convert $Comps to CSV and assign it to $PCS
 $PCS = Import-CSV $Comps
 
 Write-Host "You Selected the Path $XML" -ForegroundColor Green
 
-
+#Run a ForEach on each hostname in $PCs Assign it to $PC
 ForEach($PC in $PCs){
+  #Increment $i from 0 to get a count
   $i++
+  #Show progress of the count
   Write-Progress -Activity "Installing new MEDLINE SSID" -Status "Installed: $i of $($PCs.count)"
-
-  Write-Host "Testing $($PC.Hostname) for Activity"
-
+  
+  Write-Host "Testing $($PC.Hostname) for Activity" -ForegroundColor Green
+  #Test each computer and assign the value to $tp if it returns $True, run the script, if not export an error to an error log
   $tp = Test-Connection -ComputerName $PC.Hostname -quiet -Count 1
 
     if($tp -eq $True){
-      Write-Host "I AM ONLINE $($PC.Hostname)" 
+      #Write-Host "I AM ONLINE $($PC.Hostname)" 
       Write-Host "Copying to $($PC.Hostname)" -ForegroundColor Green
-      xcopy $XML "\\$($PC.Hostname)\C$\"
 
+      #Copy the file to the remote computer
+      xcopy $FileToTransfer "\\$($PC.Hostname)\C$\"
 
+      #remote execute the netsh add for the wireless profile
       PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan add profile filename=C:\MEDLINE.xml User=All" 
 
+      #remote execute the deletion of the wireless profile XML
+      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
+      
+      #remote execute the deletion of the wireless profile
       PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan delete profile name=excmed" 
 
-      Start-Sleep -Seconds 2
-
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
     
     }else{
       Write-Host "$($PC.Hostname) Is Unavailable" -ForegroundColor Red 

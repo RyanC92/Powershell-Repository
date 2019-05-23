@@ -76,4 +76,5 @@ if($Location -eq "Meriden" -or $Location -eq "1"){
 }else{
    
 }
-  
+
+Push-Location C:\Powershell-Repository
