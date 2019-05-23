@@ -6,7 +6,7 @@ Write-host "Attempting to lookup" $Nodes.Hostname
 
     try {
 		
-		Test-Connection $($Hns.Hostname) -quiet -Count 1 -ErrorAction Stop
+		Test-Connection $($Nodes.Hostname) -Count 1 -ErrorAction Stop
 
         $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object UserName
         $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object PSComputerName
@@ -16,7 +16,6 @@ Write-host "Attempting to lookup" $Nodes.Hostname
             "UserName" = $($UName.Username)
             "Hostname" = $($HN.PSComputerName)
             "OS" = $($OS.Caption)
-            "NotFound" = $null
         }
 
         New-Object -Typename PSCustomObject -Property $properties
