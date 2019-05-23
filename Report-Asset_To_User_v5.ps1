@@ -8,11 +8,11 @@ Write-host "Attempting to lookup" $Nodes.Hostname
 
         $pt = Test-Connection $($Nodes.Hostname) -Quiet -Count 1 
 
-        if ($open -eq $false) {error}
+        if ($pt -eq $false) {error}
 
-        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object UserName
-        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem -ErrorAction Stop | Select-Object PSComputerName
-        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem -ErrorAction Stop | Select-Object Caption
+        $UName = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object UserName
+        $HN = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_ComputerSystem | Select-Object PSComputerName
+        $OS = Get-Wmiobject -Computername $Nodes.Hostname -Class Win32_OperatingSystem | Select-Object Caption
 
         $properties = @{
             "UserName" = $($UName.Username)
