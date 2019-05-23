@@ -46,7 +46,7 @@ ForEach($PC in $PCs){
 
     if($tp -eq $True){
       Write-Host "I AM ONLINE $($PC.Hostname)" 
-      <#Write-Host "Copying to $($PC.Hostname)" -ForegroundColor Green
+      Write-Host "Copying to $($PC.Hostname)" -ForegroundColor Green
       xcopy $XML "\\$($PC.Hostname)\C$\"
 
 
@@ -57,10 +57,10 @@ ForEach($PC in $PCs){
       Start-Sleep -Seconds 2
 
       PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
-    #>
+    
     }else{
       Write-Host "$($PC.Hostname) Is Unavailable" -ForegroundColor Red 
-      $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append
+      $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append -Notypeinformation
 
     }
   
