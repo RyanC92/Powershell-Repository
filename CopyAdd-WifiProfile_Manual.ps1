@@ -1,4 +1,4 @@
-﻿#Reference Change-BulkPW_Reset.ps1 for more details on a finished script.
+#Reference Change-BulkPW_Reset.ps1 for more details on a finished script.
 
 Function Get-FileName($InitialDirectory)
 {
@@ -11,16 +11,6 @@ Function Get-FileName($InitialDirectory)
   $OpenFileDialog.ShowDialog() | Out-Null
   $OpenFileDialog.FileName
 }
-Function Get-FolderName($InitialDirectory)
-{
-    [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
-
-  $OpenFolderDialog = New-Object System.Windows.Forms.FolderBrowserDialog
-  #$OpenFolderDialog.initialDirectory = $initialDirectory
-  #$OpenFileDialog.filter = "CSV (*.csv) | *.csv"
-  $OpenFolderDialog.ShowDialog() | Out-Null
-  $OpenFolderDialog.SelectedPath
-}
 
 $i = 0
 
@@ -30,10 +20,7 @@ $FileToTransfer = Get-FileName
 
 Write-host "Select the List of Computers to transfer the shortcut to" -ForegroundColor Green
 #Use Function to Get the CSV list of Computers
-$Comps = Get-FileName
-
-#Convert $Comps to CSV and assign it to $PCS
-$PCS = Import-CSV $Comps
+$PCs = Read-host "Enter hostname"
 
 Write-Host "You Selected the Path $XML" -ForegroundColor Green
 
@@ -44,29 +31,29 @@ ForEach($PC in $PCs){
   #Show progress of the count
   Write-Progress -Activity "Installing new MEDLINE SSID" -Status "Installed: $i of $($PCs.count)"
   
-  Write-Host "Testing $($PC.Hostname) for Activity" -ForegroundColor Green
+  Write-Host "Testing $PC for Activity" -ForegroundColor Green
   #Test each computer and assign the value to $tp if it returns $True, run the script, if not export an error to an error log
-  $tp = Test-Connection -ComputerName $PC.Hostname -quiet -Count 1
+  $tp = Test-Connection -ComputerName $PC -quiet -Count 1
 
     if($tp -eq $True){
       #Write-Host "I AM ONLINE $($PC.Hostname)" 
-      Write-Host "Copying to $($PC.Hostname)" -ForegroundColor Green
+      Write-Host "Copying to $PC" -ForegroundColor Green
 
       #Copy the file to the remote computer
-      xcopy $FileToTransfer "\\$($PC.Hostname)\C$\"
+      xcopy $FileToTransfer "\\$PC\C$\"
 
       #remote execute the netsh add for the wireless profile
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan add profile filename=C:\MEDLINE.xml User=All" 
+      PsExec64.exe "\\$PC" cmd.exe /c "netsh wlan add profile filename=C:\MEDLINE.xml User=All" 
 
       #remote execute the deletion of the wireless profile XML
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
+      PsExec64.exe "\\$PC" cmd.exe /c "del C:\MEDLINE.XML"
 
       #remote execute the deletion of the wireless profile
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan delete profile name=excmed" 
+      PsExec64.exe "\\$PC" cmd.exe /c "netsh wlan delete profile name=excmed" 
     
     }else{
-      Write-Host "$($PC.Hostname) Is Unavailable" -ForegroundColor Red 
-      $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append -Notypeinformation
+      Write-Host "$PC Is Unavailable" -ForegroundColor Red 
+      $PC | Select @{Name = "Hostname"; Expression = {$PC}} | Export-csv C:\CSV\FailedHostnames$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv -Append -Notypeinformation
 
     }
    
