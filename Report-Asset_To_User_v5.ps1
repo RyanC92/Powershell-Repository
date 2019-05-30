@@ -30,7 +30,8 @@ Write-host "Attempting to lookup" $Nodes.Hostname
         "$open"
 
         $($nodes.Hostname) | Add-Content C:\CSV\Error.log
-	}
+        
+	    }
 }
 
 $collection | Export-csv C:\CSV\UserInfo$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv -NoTypeInformation -Append
