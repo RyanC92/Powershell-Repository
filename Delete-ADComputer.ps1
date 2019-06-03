@@ -17,6 +17,7 @@ $local = Get-Location
 $HN = Import-csv C:\CSV\DeletefromAD.csv
 
 $HN
+
 $Choice = Read-Host "Are you Sure you want to Delete these? "
 
 
