@@ -94,7 +94,7 @@ $WPFCombobox_building.Add_DropDownClosed({
 	#Disabled for testing
 	<#$printer = Get-Printer | Where { $_.Location -like "$cob*"}
 	$printer.Location#>
-	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+	$global:printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Location -like "*$cob*"}
 
 
 	$WPFckb.Items.Clear()
