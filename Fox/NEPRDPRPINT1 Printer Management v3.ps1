@@ -104,7 +104,7 @@ foreach ($printer in $global:printers) {
   $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
 
 	$NewCheckbox = New-Object System.Windows.Controls.Checkbox
-   # $NewCheckbox.Name = "$($printer.name)"
+    $NewCheckbox.Name = "$($printer.name)"
     $NewCheckbox.Content = "$($printer.Sharename)"
     $NewCheckbox.Height = 20
     $WPFckb.AddChild($NewCheckbox)
