@@ -97,6 +97,11 @@ $WPFCombobox_building.Add_DropDownClosed({
 	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
 	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
 
+		#Disabled for testing
+	<#$global:printers = Get-Printer | Where { $_.Comment -like "$cob*"}
+	$printer = Get-Printer | Where { $_.Comment -like "$cob*"}
+	$printer.Location#>
+
 	}
 	else {
 	#Disabled for testing
