@@ -3,3 +3,5 @@
 *.txt
 *.vs*
 .vs/slnx.sqlite
+*.sqlite
+
