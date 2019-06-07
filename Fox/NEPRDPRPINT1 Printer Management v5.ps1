@@ -92,20 +92,23 @@ $WPFCombobox_building.Add_DropDownClosed({
 	Write-Host "You Selected: $cob"
 
 	#Disabled for testing
-	<#$printer = Get-Printer | Where { $_.Location -like "$cob*"}
-	$printer.Location#>
-	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")}
-	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")}
-
+    
+    $global:printers = Get-Printer | Where { ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
+    $printer = Get-Printer | Where{ ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
+    $printer.Location
+    
+	<#$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+    #>
 
 	$WPFckb.Items.Clear()
 
 foreach ($printer in $printers) {
 
-  $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
+  $test = $printer.name -replace '[^a-zA-Z0-9]',''
 
 	$NewCheckbox = New-Object System.Windows.Controls.Checkbox
-    $NewCheckbox.Name = "$($printer.name)"
+    $NewCheckbox.Name = "$($test)"
     $NewCheckbox.Content = "$($printer.Sharename)"
     $NewCheckbox.Height = 20
 

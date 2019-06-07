@@ -2,7 +2,7 @@
 if (!$args[0]) {
 	
 }
-$mailbox=get-mailbox $user
+$mailbox = get-mailbox $user
 
 $dgs= Get-DistributionGroup
  
