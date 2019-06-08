@@ -46,6 +46,7 @@ catch{
 }
 #>
 
+
 $xaml.SelectNodes("//*[@Name]") | %{"trying item $($_.Name)";
     try {Set-Variable -Name "WPF$($_.Name)" -Value $Form.FindName($_.Name) -ErrorAction Stop}
     catch{throw}
@@ -63,6 +64,12 @@ Get-FormVariables
 <#$printer = Get-Printer | Where { $_.Location -like "$cob*"}
 $printer.Location#>
 
+
+
+
+
+
+
 $WPFRadioButton_remote.Add_Checked({
      $WPFTextbox_Hostname.IsEnabled=$true
      })
@@ -70,53 +77,95 @@ $WPFRadioButton_remote.Add_UnChecked({
     $WPFTextbox_Hostname.IsEnabled=$false
     })
 
-
+#List buildings / options
 "1919",
 "1923",
 "1930",
 "1933",
 "Xerox" | ForEach-object {$WPFCombobox_building.AddChild($_)}
 
+#Write the selection
 Write-Host $wpf
 
 $WPFCombobox_building.Add_DropDownClosed({
 
-	$cob = $WPFCombobox_building.Text
+    #$cob is the combo box option that the user selects
+    $cob = $WPFCombobox_building.Text
+    #write out the choice
 	Write-Host "You Selected: $cob"
 
-	#Disabled for testing
-    
-    $global:printers = Get-Printer | Where { ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
-    $printer = Get-Printer | Where{ ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
-    $printer.Location
-    
-	<#$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
-	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
-    #>
+    #If cob is equal to Xerox then 
+	if ($cob -eq "Xerox") {
 
+	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
+	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
+
+		#Disabled for testing
+	<#$global:printers = Get-Printer | Where { $_.Comment -like "$cob*"}
+	$printer = Get-Printer | Where { $_.Comment -like "$cob*"}
+	$printer.Location#>
+
+	}else {
+	#Disabled for testing
+	<#$global:printers = Get-Printer | Where { $_.Location -like "$cob*"}
+	$printer = Get-Printer | Where { $_.Location -like "$cob*"}
+	$printer.Location#>
+	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+    $printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+    
+
+        foreach ($printer in $printers) {
+
+            $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
+        
+            $NewCheckbox = New-Object System.Windows.Controls.Checkbox
+            $NewCheckbox.Name = "$($printer.name)"
+            $NewCheckbox.Content = "$($printer.Sharename)"
+            $NewCheckbox.Height = 20
+        
+            $WPFckb.AddChild($NewCheckbox)
+        
+        
+        
+        }
+    }
+    
 	$WPFckb.Items.Clear()
 
 foreach ($printer in $printers) {
 
-  $test = $printer.name -replace '[^a-zA-Z0-9]',''
+  $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
 
 	$NewCheckbox = New-Object System.Windows.Controls.Checkbox
-    $NewCheckbox.Name = "$($test)"
+    $NewCheckbox.Name = "$($printer.name)"
     $NewCheckbox.Content = "$($printer.Sharename)"
     $NewCheckbox.Height = 20
 
     $WPFckb.AddChild($NewCheckbox)
 
+
+
 	}
 })
+
+
+
 
 $WPFButton_intallprinters.Add_Click({
 	$global:cob = $WPFCombobox_building.Text
 
+
 $Form.Close()
 })
 
+
 write-host "To show the form, run the following" -ForegroundColor Cyan
+
+
+
+
+
+
 
 function Show-Form{
 $Form.ShowDialog() | out-null
@@ -135,7 +184,10 @@ function deletePrinter{
 
 }#>
 
+
 Show-Form
+
+
 
 	$box = $WPFckb.Items
 	$tests = $box.IsChecked
