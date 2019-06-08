@@ -97,8 +97,8 @@ $WPFCombobox_building.Add_DropDownClosed({
     #If cob is equal to Xerox then 
 	if ($cob -eq "Xerox") {
 
-	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
-	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Comment -like "*$cob*"}
+	$global:printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Comment -like "*$cob*"} | sort-object Sharename
+	$printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Comment -like "*$cob*"} | sort-object Sharename
 
 		#Disabled for testing
 	<#$global:printers = Get-Printer | Where { $_.Comment -like "$cob*"}
@@ -110,38 +110,27 @@ $WPFCombobox_building.Add_DropDownClosed({
 	<#$global:printers = Get-Printer | Where { $_.Location -like "$cob*"}
 	$printer = Get-Printer | Where { $_.Location -like "$cob*"}
 	$printer.Location#>
-	$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
-    $printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
+	$global:printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Location -like "$cob*"} | sort-object Sharename
+    $printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Location -like "$cob*"} | sort-object Sharename
     
+       
 
-        foreach ($printer in $printers) {
-
-            $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
-        
-            $NewCheckbox = New-Object System.Windows.Controls.Checkbox
-            $NewCheckbox.Name = "$($printer.name)"
-            $NewCheckbox.Content = "$($printer.Sharename)"
-            $NewCheckbox.Height = 20
-        
-            $WPFckb.AddChild($NewCheckbox)
-        
-        
-        
-        }
     }
     
+    ######### Why? #########
 	$WPFckb.Items.Clear()
 
-foreach ($printer in $printers) {
+    #Foreach of printers pulled from the CSV (or get-printer) to run through each line and list the printers
+    foreach ($printer in $printers) {
 
-  $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
+        $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
 
-	$NewCheckbox = New-Object System.Windows.Controls.Checkbox
-    $NewCheckbox.Name = "$($printer.name)"
-    $NewCheckbox.Content = "$($printer.Sharename)"
-    $NewCheckbox.Height = 20
+        $NewCheckbox = New-Object System.Windows.Controls.Checkbox
+        $NewCheckbox.Name = "$($printer.name)"
+        $NewCheckbox.Content = "$($printer.Sharename)"
+        $NewCheckbox.Height = 20
 
-    $WPFckb.AddChild($NewCheckbox)
+        $WPFckb.AddChild($NewCheckbox)
 
 
 
@@ -150,7 +139,7 @@ foreach ($printer in $printers) {
 
 
 
-
+###### Is it installing printers here? ######
 $WPFButton_intallprinters.Add_Click({
 	$global:cob = $WPFCombobox_building.Text
 
@@ -158,14 +147,8 @@ $WPFButton_intallprinters.Add_Click({
 $Form.Close()
 })
 
-
+###### Turn this into a show background process button? ######
 write-host "To show the form, run the following" -ForegroundColor Cyan
-
-
-
-
-
-
 
 function Show-Form{
 $Form.ShowDialog() | out-null
@@ -188,7 +171,7 @@ function deletePrinter{
 Show-Form
 
 
-
+######## Are you testing to see how long the length of the character string is or the total number of printers it will process? #######
 	$box = $WPFckb.Items
 	$tests = $box.IsChecked
 
