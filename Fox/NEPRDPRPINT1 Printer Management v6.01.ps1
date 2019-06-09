@@ -141,8 +141,6 @@ $WPFCombobox_building.Add_DropDownClosed({
 
 ###### Is it installing printers here? ######
 $WPFButton_intallprinters.Add_Click({
-
-
 $Form.Close()
 })
 
