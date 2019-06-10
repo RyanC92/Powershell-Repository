@@ -132,11 +132,11 @@ $WPFCombobox_building.Add_DropDownClosed({
     foreach ($printer in $printers) {
 		
 		#Make the printer name C# / .NET Friendly by removing the spaces and special characters (needs to be alphanumeric)
-        $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
+        $PrinterRename = $printer.name -replace '[^a-zA-Z0-9]',''
 
 		#Create a new object (for the type of object listed below)
         $NewCheckbox = New-Object System.Windows.Controls.Checkbox
-        $NewCheckbox.Name = "$($printer.name)"
+        $NewCheckbox.Name = "$($PrinterRename.name)"
         $NewCheckbox.Content = "$($printer.Sharename)"
 
 		#Creates the checkboxes under "Available printers"
@@ -194,13 +194,13 @@ $ProgressBar = New-ProgressBar -IsIndeterminate $False -Size Medium
 			if ($WPFTextbox_Hostname.IsEnabled -eq $True){
 
 			
-			PSexec64.exe "\\$($WPFTextbox_hostname.text)" powershell.exe /c "rundll32 printui.dll,PrintUIEntry /q /in /ga /n \\$($Printers.Computername)\$($box.Content)" 
+			PSexec64.exe "\\$($WPFTextbox_hostname.text)" powershell.exe /c "rundll32 printui.dll,PrintUIEntry /q /in /ga /n \\NEPPRDPRINT1\$($box.Content)" 
 			
 
 			}else{
 
 			
-			rundll32 printui.dll,PrintUIEntry /q /in /ga /n "\\$($Printers.Computername)\$($box.Content)"
+			rundll32 printui.dll,PrintUIEntry /q /in /ga /n "\\NEPPRDPRINT1\$($box.Content)"
 			
 			}
 
