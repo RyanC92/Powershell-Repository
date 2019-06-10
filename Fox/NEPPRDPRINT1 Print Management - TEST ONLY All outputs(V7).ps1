@@ -1,4 +1,4 @@
-﻿
+
 #Uncomment this to HIDE the powershell window (you will only see the GUI)
 #$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
 #add-type -name win -member $t -namespace native
