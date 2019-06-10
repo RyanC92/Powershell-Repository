@@ -1,4 +1,5 @@
 ﻿
+#Uncomment this to HIDE the powershell window (you will only see the GUI)
 #$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
 #add-type -name win -member $t -namespace native
 #[native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0)
@@ -35,34 +36,38 @@ $inputXML = $inputXML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace
 #Read XAML
 
 $reader=(New-Object System.Xml.XmlNodeReader $xaml)
-$Form=[Windows.Markup.XamlReader]::Load( $reader )
-<#
+
+
 try{
-    
+    $Form=[Windows.Markup.XamlReader]::Load( $reader )
 }
 catch{
     Write-Warning "Unable to parse XML, with error: $($Error[0])`n Ensure that there are NO SelectionChanged or TextChanged properties in your textboxes (PowerShell cannot process them)"
     throw
 }
-#>
 
-$xaml.SelectNodes("//*[@Name]") | %{"trying item $($_.Name)";
-    try {Set-Variable -Name "WPF$($_.Name)" -Value $Form.FindName($_.Name) -ErrorAction Stop}
+
+
+$xaml.SelectNodes("//*[@Name]") | %{"trying item $($_.Name)" | out-null;
+    try {Set-Variable -Name "WPF$($_.Name)" -Value $Form.FindName($_.Name) -ErrorAction Stop | out-null }
     catch{throw}
     }
+	
 
 Function Get-FormVariables{
 if ($global:ReadmeDisplay -ne $true){Write-host "If you need to reference this display again, run Get-FormVariables" -ForegroundColor Yellow;$global:ReadmeDisplay=$true}
 write-host "Found the following interactable elements from our form" -ForegroundColor Cyan
-get-variable WPF*
+#get-variable WPF*
 }
 
-Get-FormVariables
+#Get-FormVariables
 
 #Disabled for testing
 <#$printer = Get-Printer | Where { $_.Location -like "$cob*"}
 $printer.Location#>
 
+
+#Remote or Local - If the Remote is not selected, disable hostname box (in GUI)
 $WPFRadioButton_remote.Add_Checked({
      $WPFTextbox_Hostname.IsEnabled=$true
      })
@@ -70,53 +75,73 @@ $WPFRadioButton_remote.Add_UnChecked({
     $WPFTextbox_Hostname.IsEnabled=$false
     })
 
-
+#List buildings / options
 "1919",
 "1923",
 "1930",
 "1933",
 "Xerox" | ForEach-object {$WPFCombobox_building.AddChild($_)}
 
-Write-Host $wpf
+#Write the selection
+#Write-Host $wpf
 
+#Will proceed when you select a building 
 $WPFCombobox_building.Add_DropDownClosed({
 
-	$cob = $WPFCombobox_building.Text
-	Write-Host "You Selected: $cob"
+    #$cob is the combo box option that the user selects
+    $cob = $WPFCombobox_building.Text
+    #write out the choice
+	#Write-Host "You Selected: $cob"
 
-	#Disabled for testing
-    
-    $global:printers = Get-Printer | Where { ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
-    $printer = Get-Printer | Where{ ($_.Location -like "$cob*") -or ($_.Comment -like "*$($cob)*")} | Sort-Object Sharename
-    $printer.Location
-    
-	<#$global:printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
-	$printers = import-csv  C:\CSV\PrinterExport.csv | Where { $_.Location -like "$cob*"}
-    #>
+    #If cob is equal to Xerox then do this if not, then run the code in else
+	if ($cob -eq "Xerox") {
+		
+		$global:printers = Get-Printer | Where { $_.Comment -like "$cob*"} | sort-object Sharename
+		$printer = Get-Printer | Where { $_.Comment -like "$cob*"} | sort-object Sharename
 
+		#Use this for testing
+		<#$global:printers = import-csv  c:\powershell-repository\fox\printerexport.csv | where { $_.comment -like "*$cob*"} | sort-object sharename
+		$printers = import-csv  c:\powershell-repository\fox\printerexport.csv | where { $_.comment -like "*$cob*"} | sort-object sharename
+		#>
+
+	} else {
+
+		
+		$global:printers = Get-Printer | Where { $_.Location -like "$cob*"} | sort-object Sharename
+		$printer = Get-Printer | Where { $_.Location -like "$cob*"} | sort-object Sharename
+
+		#Use this for testing
+		<#$global:printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Location -like "$cob*"} | sort-object Sharename
+		#$printers = import-csv  C:\Powershell-Repository\Fox\PrinterExport.csv | Where { $_.Location -like "$cob*"} | sort-object Sharename#>
+    
+    }
+    
+    #If another building is selected, remove the printers in "Available Printers:"
 	$WPFckb.Items.Clear()
 
-foreach ($printer in $printers) {
+    #Foreach of printers pulled from the CSV (or get-printer) to run through each line and list the printers
+    foreach ($printer in $printers) {
+		
+		#Make the printer name C# / .NET Friendly by removing the spaces and special characters (needs to be alphanumeric)
+        $printer.name = $printer.name -replace '[^a-zA-Z0-9]',''
 
-  $test = $printer.name -replace '[^a-zA-Z0-9]',''
+		#Create a new object (for the type of object listed below)
+        $NewCheckbox = New-Object System.Windows.Controls.Checkbox
+        $NewCheckbox.Name = "$($printer.name)"
+        $NewCheckbox.Content = "$($printer.Sharename)"
 
-	$NewCheckbox = New-Object System.Windows.Controls.Checkbox
-    $NewCheckbox.Name = "$($test)"
-    $NewCheckbox.Content = "$($printer.Sharename)"
-    $NewCheckbox.Height = 20
-
-    $WPFckb.AddChild($NewCheckbox)
+		#Creates the checkboxes under "Available printers"
+        $WPFckb.AddChild($NewCheckbox)
 
 	}
 })
 
-$WPFButton_intallprinters.Add_Click({
-	$global:cob = $WPFCombobox_building.Text
 
+#When you click Install Printers, close the form
+$WPFButton_intallprinters.Add_Click({
 $Form.Close()
 })
 
-write-host "To show the form, run the following" -ForegroundColor Cyan
 
 function Show-Form{
 $Form.ShowDialog() | out-null
@@ -135,22 +160,37 @@ function deletePrinter{
 
 }#>
 
+
 Show-Form
 
-	$box = $WPFckb.Items
-	$tests = $box.IsChecked
+	#Items is the full list that exists in WPFckb 
+	#They get filtered to IsChecked equals True, select the name, content and isChecked
+	$boxes = $WPFckb.Items | where-object {$_.IsChecked -eq $True} | Select name, Content, IsChecked
+	#$tests = $box.IsChecked
 
-		$te = $global:printers.name
+	$boxesCount = $boxes | measure
+	$i = 0
 
-
-	If($te.Length -match $tests.Length)
-{
-    For($i=0;$i -lt $te.Length; $i++) 
-    {
-
-		if ("$($tests[$i])" -eq $true) {Write-Host "$($te[$i])" "is true"}
-
-    }
-}
+	$te = $global:printers.name
 
 
+		foreach ($box in $boxes) {
+			
+			if ($WPFTextbox_Hostname.IsEnabled -eq $True){
+			
+			PSexec64.exe "\\$($WPFTextbox_hostname.text)" powershell.exe /c "rundll32 printui.dll,PrintUIEntry /q /in /ga /n \\$($Printers.Computername)\$($box.Content)" 
+			$i++
+
+			}else{
+			
+			rundll32 printui.dll,PrintUIEntry /q /in /ga /n "\\$($Printers.Computername)\$($box.Content)"
+			$i++
+			}
+
+		Write-Progress -Activity "Installing Printer - $i of $BoxesCount" -Status "$i% Complete" -PercentComplete $i
+
+		}
+
+
+#Add button To remove, list local printers intalled in Available printer list. Select printers then remove. 
+#Get printer for local machine, Pass to window, select then do rundll32 printui and remove (/GD)
