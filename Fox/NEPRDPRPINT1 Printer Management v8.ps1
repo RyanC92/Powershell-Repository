@@ -199,6 +199,8 @@ $ProgressBar = New-ProgressBar -IsIndeterminate $False -Size Medium
 
 			}else{
 
+            Start-Sleep -s 2
+
 			
 			rundll32 printui.dll,PrintUIEntry /q /in /ga /n "\\NEPPRDPRINT1\$($box.Content)"
 			
@@ -206,7 +208,7 @@ $ProgressBar = New-ProgressBar -IsIndeterminate $False -Size Medium
 
 		$pc = $PC + $precentc
 		
-		Write-ProgressBar -ProgressBar $Progressbar -Activity "Printer Installer" -Status "Installing" -CurrentOperation $box.Content -PercentComplete $PC
+		Write-ProgressBar -ProgressBar $Progressbar -Activity "Printer Installer" -Status "Installing" -CurrentOperation "$($box.Content)" -PercentComplete $PC
 
 		}
 
