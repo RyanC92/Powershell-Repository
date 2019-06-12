@@ -1,7 +1,3 @@
-
-
-
-
 #Uncomment this to HIDE the powershell window (you will only see the GUI)
 #$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
 #add-type -name win -member $t -namespace native
@@ -24,6 +20,7 @@ Try{
     Import-Module -Name PoshProgressBar
 
 }
+ 
 
 $inputXML = @"
 <Window x:Class="_1.MainWindow"
@@ -56,7 +53,7 @@ $inputXML = $inputXML -replace 'mc:Ignorable="d"','' -replace "x:N",'N' -replace
 [void][System.Reflection.Assembly]::LoadWithPartialName('presentationframework')
 [xml]$XAML = $inputXML
 #Read XAML
-
+#>
 $reader=(New-Object System.Xml.XmlNodeReader $xaml)
 
 
@@ -74,7 +71,6 @@ $xaml.SelectNodes("//*[@Name]") | %{"trying item $($_.Name)" | out-null;
     try {Set-Variable -Name "WPF$($_.Name)" -Value $Form.FindName($_.Name) -ErrorAction Stop | out-null }
     catch{throw}
     }
-	
 
 Function Get-FormVariables{
 if ($global:ReadmeDisplay -ne $true){Write-host "If you need to reference this display again, run Get-FormVariables" -ForegroundColor Yellow;$global:ReadmeDisplay=$true}
@@ -228,7 +224,8 @@ $ProgressBar = New-ProgressBar -IsIndeterminate $False -Size Medium
                     
     Close-ProgressBar $ProgressBar
     Start-Sleep -s 5
-    exit
+    
+exit
 
 
 #Add button To remove, list local printers intalled in Available printer list. Select printers then remove. 
