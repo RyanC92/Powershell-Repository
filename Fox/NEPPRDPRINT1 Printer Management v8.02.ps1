@@ -1,7 +1,9 @@
 #Uncomment this to HIDE the powershell window (you will only see the GUI)
-$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
+<#$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
 add-type -name win -member $t -namespace native
 [native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0)
+#>
+
 
 #Installs modules needed for progress bar
 <#$mod = Test-Path C:\Users\Urban\Documents\WindowsPowerShell\Modules\PoshProgressBar\0.132\PoshProgressBar.psm1
@@ -13,10 +15,10 @@ Install-Module -Name PoshProgressBar -Scope CurrentUser -force
 #>
 
 Try{
-    Import-Module -Name PoshProgressBar
+    Import-Module -Name PoshProgressBar -Erroraction stop
 }Catch{
     Install-PackageProvider -Name NuGet -Scope CurrentUser -Force
-    Install-Module -Name PoshProgressBar -ScopeCurrentUser -Force
+    Install-Module -Name PoshProgressBar -Scope CurrentUser -Force
     Import-Module -Name PoshProgressBar
 
 }
@@ -203,7 +205,7 @@ $ProgressBar = New-ProgressBar -IsIndeterminate $False -Size Medium
 			if ($WPFTextbox_Hostname.IsEnabled -eq $True){
 
 			
-			PSexec64.exe "\\$($WPFTextbox_hostname.text)" powershell.exe /c "rundll32 printui.dll,PrintUIEntry /q /in /ga /n \\$($Printers.Computername[1])\$($box.Content)" 
+			PSexec64.exe "\\$($WPFTextbox_hostname.text)" powershell.exe /c "rundll32 printui.dll,PrintUIEntry /q /in /ga /n '\\$($Printers.Computername[1])\$($box.Content)'" 
 			
 
 			}else{
