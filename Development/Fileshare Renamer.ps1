@@ -6,6 +6,7 @@ By: Ryan Curran
 7/10/19
 #>
 
+import-module activedirectory
 
 $UDriveList = Get-Childitem -Path "\\usnjfs001\H$" -exclude _Archive,Batch,Kioware$
 $Users = Get-aduser -Filter {Enabled -eq $True} -SearchBase "OU=Users,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com" 
@@ -20,11 +21,13 @@ ForEach($CompList in $Comp){
     $UNConvert = $Complist.InputObject
     
     if($Complist.SideIndicator -eq "<="){
-        "$UNConvert is on the FS not AD"
+        #Exists in AD but the fileshare is wrong
+        #Assign to variable to pass used for the renaming
         #$ADuserRem = 
-        Get-Aduser -Filter {SamAccountName -Like $UNConvert}
-    }else {
-        $Complist
+        Get-Aduser -Filter * | Where-Object{$_.SamAccountName -Like "$UNConvert*"}
+    }elseif{
+        
+        
     }
 
 }
