@@ -19,15 +19,18 @@ $Comp = Compare-Object -ReferenceObject $Splat1.Folder -DifferenceObject $Splat1
 
 ForEach($CompList in $Comp){
     $UNConvert = $Complist.InputObject
-    
+    $FNConvert = $Complist.
+    #if the side indicator states that the Folder name exists on the fileshare but not in AD, (User may not exist at all or it may be incorrect)
     if($Complist.SideIndicator -eq "<="){
-        #Exists in AD but the fileshare is wrong
-        #Assign to variable to pass used for the renaming
-        #$ADuserRem = 
-        Get-Aduser -Filter * | Where-Object{$_.SamAccountName -Like "$UNConvert*"}
-    }elseif{
-        
-        
+        #Search AD for a username that is SIMILAR to the fileshare name 
+        $ADuserRem = Get-Aduser -Filter {Enabled -eq $True} -SearchBase "OU=Users,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com" | Where-Object{$_.SamAccountName -Like "$UNConvert*"}
+        #If exists, Pass username to variable to use for RENAMING the folder
+
+        #After Folder is renamed, RESHARE as Username$, assign permissions to that user for full control
+    }elseif($CompList.SideIndicator -eq "=>"){
+        #These need to be renamed to match AD
+        Write-host "$($Complist.InputObject) - Exists in AD" -ForegroundColor Red
+
     }
 
 }
