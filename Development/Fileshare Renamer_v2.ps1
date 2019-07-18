@@ -27,23 +27,27 @@ ForEach ($Complist in $Comp) {
     if ($Complist.SideIndicator -eq "<=" ) {
         #Search AD for a username that is SIMILAR to the fileshare name 
 
-        #$ADuserRem = 
-        $Users | Where-Object {$_.SamAccountName -Like "$UNConvert*"}
+        $ADuserRem = $Users | Where-Object {$_.SamAccountName -Like "$UNConvert*"}
         #If exists, Pass username to variable to use for RENAMING the folder
+<#         "User: $($AduserRem.SamAccountname)"
+        "Folder: $($UNConvert)" #>
+        $ADuserMeasure = $ADuserRem | Measure
 
+        if($Adusermeasure.count -ne '1'){
+            $UNConvert
+            $Adusermeasure
+        }
        # Write-Host "$UNConvert is the Foldername"
-      #  Write-Host "$($ADuserRem.SamAccountName) is the correct username"
+       # Write-Host "$($ADuserRem.SamAccountName) is the correct username"
 
         #After Folder is renamed, RESHARE as Username$, assign permissions to that user for full control
 
-    } ElseIf ($Complist.SideIndicator -eq "=>"){
+    } <#ElseIf ($Complist.SideIndicator -eq "=>"){
         #These need to be renamed to match AD
         Write-host "$($Complist.InputObject) - Exists in AD" -ForegroundColor Red
 
-    
-    } Else {
-
-        "Nothing"
+    #>
+    Else{
 
     }
-}
+} 
