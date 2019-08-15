@@ -1,4 +1,9 @@
-$UDTest = Get-item  -Path "\\usnjfs001\H$\_Archive\wmurray" -exclude _archive,Batch,Kioware$,rcurran,jbilotti,rraia,vmarzarella
+$UDTest = Get-item  -Path "\\usnjfs001\H$\_Archive\mkaruzas" -exclude _archive,Batch,Kioware$,rcurran,jbilotti,rraia,vmarzarella
+
+#establish parameters for cimsession
+$Computername = 'usnjfs001'
+$fullaccess = 'everyone'
+$Session = New-CimSession -Computername $Computername
 
 FoReach ($UDL in $UDTest){
 
@@ -23,6 +28,11 @@ FoReach ($UDL in $UDTest){
 
     }
 
+    $ANRhidden = "$($Accountnamereplace.accountname)" + '$'
     Rename-Item -Path $UDL.FullName -Newname "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)"
     
+    New-SMBShare -Name $ANRhidden -Path "H:\_Archive\$($AccountNameReplace.AccountName)" -Fullaccess $fullaccess -Cimsession $Session 
+
 }
+
+Remove-Cimsession -cimsession $Session
