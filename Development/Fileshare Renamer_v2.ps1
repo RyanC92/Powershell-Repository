@@ -10,12 +10,8 @@ Import-module activedirectory
 
 $udrivelist = Get-Childitem -Path "\\usnjfs001\H$" -exclude _archive,Batch,Kioware$
 $Users = Get-ADuser -Filter {Enabled -eq $True} -Searchbase "OU=Users,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=COM"
-$Splat1 = @{
-    Username = $Users.SamAccountName
-    Folder = $UDriveList.Name
-}
 
-$Comp = Compare-Object -ReferenceObject $Splat1.Folder -DifferenceObject $Splat1.Username
+$Comp = Compare-Object -ReferenceObject $UdriveList.Name -DifferenceObject $Users.SamAccountName
 
 ForEach ($Complist in $Comp) {
 
@@ -24,13 +20,14 @@ ForEach ($Complist in $Comp) {
 
     #if the side indicator states that the Folder name exists on the fileshare but not in AD, (User may not exist at all or it may be incorrect)
 
-    if ($Complist.SideIndicator -eq "<=" ) {
+    if ($FNConvert -eq "<=" ) {
         #Search AD for a username that is SIMILAR to the fileshare name 
 
         $ADuserRem = $Users | Where-Object {$_.SamAccountName -Like "$UNConvert*"}
         #If exists, Pass username to variable to use for RENAMING the folder
 <#         "User: $($AduserRem.SamAccountname)"
         "Folder: $($UNConvert)" #>
+        $ADuserRem
         $ADuserMeasure = $ADuserRem | Measure
 
         if($Adusermeasure.count -ne '1'){
