@@ -14,6 +14,7 @@ FoReach ($UDL in $UDTest){
     
     #Permissions to restore
     $Accounts2 = Get-Ntfsaccess -Path "\\usnjfs001\h$\_Archive\$($udl.name)"
+    $Accounts3 = @{"Medline-NT\Domain Admins", "Medline-NT\Excelsior Admins","Builtin\Administrators"}
 
     #Turn make the account name without Medline-NT\
     $AccNR = $Accounts.Account.accountname -replace [Regex]::Escape('Medline-nt\'),"" | Where{$_ -ne ""}
@@ -33,6 +34,18 @@ FoReach ($UDL in $UDTest){
     
     New-SMBShare -Name $ANRhidden -Path "H:\_Archive\$($AccountNameReplace.AccountName)" -Fullaccess $fullaccess -Cimsession $Session 
 
+    ForEach($Acc2 in $Accounts2){
+        
+        "Adding $($Acc2.AccessRights) to $($Accountnamereplace.Accountname)"
+        Add-NTFSACCESS -Path "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)" -Account $Acc2.Account -AccessRights $Acc2.AccessRights
+        
+            ForEach($Acc3 in $Accounts3){
+
+                Add-NTFSaccess -Path "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)" -Account $Acc3 -AccessRights "FullControl"
+            }
+        
+
+    }
 }
 
 Remove-Cimsession -cimsession $Session

@@ -1,14 +1,10 @@
-$udrivelist = @{}
+$udrivelist = Get-Childitem -Path "\\usnjfs001\H$" -exclude _archive,Batch,Kioware$
 
-Get-Childitem -Path "\\usnjfs001\H$" -exclude _archive,Batch,Kioware$ | ForEach-Object { $Udrivelist[$_.Name] = $_ }
-$udrivelist.value 
 ForEach($UDL in $Udrivelist){
 
-    $ACL = Get-Acl -Path ""\\USNJFS001\H$\$($UDL.name)"" 
+    $ACL = Get-Acl -Path "\\USNJFS001\H$\$($UDL.name)" 
 
     #New-Item -Path "C:\Testing\$($UDL.Name)" -ItemType Directory
-
-    
     
     ForEach($ACLUser in $ACL){
         #ACLUser.Access and ACLUser.PSChildname

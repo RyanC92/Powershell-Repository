@@ -31,17 +31,22 @@ $Comps = Get-FileName
 
 $SC = $Shortcut
 $PCS = Import-CSV $Comps
+$i = 0
 
-$SC
 
-<#ForEach ($PC in $PCS){
+ForEach ($PC in $PCS){
+  #Increment $i from 0 to get a count
+  $i++
+  #Show progress of the count
+  Write-Progress -Activity "Copying $SC" -Status "Copied: $i of $($PCs.count)"
+  
   Write-host "Copying to $($PC.Hostname)"
-  xcopy $SC "\\$($PC.Hostname)\C$\Users\Public\Desktop"
+  xcopy $SC "\\$($PC.Hostname)\C$\Users\Public\Desktop" /y 
 
-}#>
+}
 
-ForEach($PC in $PCs){
+<# ForEach($PC in $PCs){
   Write-Host "Copying to $($PC.Hostname)"
   xcopy $SC "\\$($PC.Hostname)\C$\ProgramData\Microsoft\Windows\Start Menu\"
 
-}
+} #>
