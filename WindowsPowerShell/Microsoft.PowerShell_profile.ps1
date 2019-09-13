@@ -1,5 +1,23 @@
 import-module activedirectory
 
+CD C:\Powershell-Repository
+
+
+Function Connect-2016{
+
+$Credential = Get-Credential -Credential pa-rcurran
+
+Write-Output "Getting Exchange Online cmdlets"
+
+$Session = New-PSSession -ConfigurationName Microsoft.Exchange `
+    -ConnectionUri http://NEPPRDEXCH02.Medline.com/PowerShell/ -Authentication Kerberos -Credential $Credentials
+
+Import-PSSession $session
+
+
+}
+
+
 Function Connect-ExOnline{
 
 $Credential = Get-Credential -Credential Rcurran@excelsiormedical.com
