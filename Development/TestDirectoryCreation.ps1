@@ -2,9 +2,9 @@ $udrivelist = Get-Childitem -Path "\\usnjfs001\H$" -exclude _archive,Batch,Kiowa
 
 ForEach($UDL in $Udrivelist){
 
-    $ACL = Get-Acl -Path "\\USNJFS001\H$\$($UDL.name)" 
+    $ACL = Get-NTFSaccess -Path "\\USNJFS001\H$\$($UDL.name)" 
 
-    #New-Item -Path "C:\Testing\$($UDL.Name)" -ItemType Directory
+    #New-Item -Path "\\usnjfs001\H$\_Archive\Test\$($UDL.Name)" -ItemType Directory
     
     ForEach($ACLUser in $ACL){
         #ACLUser.Access and ACLUser.PSChildname

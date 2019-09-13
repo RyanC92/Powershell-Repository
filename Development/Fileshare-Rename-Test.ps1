@@ -1,15 +1,21 @@
 #readd _Archive after testing
-$UDTest = Get-childitem -Path "\\usnjfs001\H$\_Archive" -exclude Batch,Kioware$,rcurran,jbilotti,rraia,vmarzarella,labeldesk,llemus25792,wryan701565,wwilson25757
+$UDList = Get-childitem -Path "\\usnjfs001\H$" -exclude _archive,Batch,Kioware$,rcurran,jbilotti,rraia,vmarzarella
+
+$i = 0
 
 #establish parameters for cimsession
 $Computername = 'usnjfs001'
 $fullaccess = 'everyone'
 $Session = New-CimSession -Computername $Computername
 
-FoReach ($UDL in $UDTest){
-
+FoReach ($UDL in $UDList){
+    
+    $i++
+    
+    Write-Progress -Activity "Getting NTFS Permissions" -Status "Processing: $i of $($UDList.Count)"
+    
     #isolate the original owners name / permissions
-    $Accounts = Get-Ntfsaccess -Path "\\usnjfs001\h$\_Archive\$($udl.name)" | Where-object{$_.Account -notlike "*Admins" -and $_.Account -notlike "S-1*" `
+    $Accounts = Get-Ntfsaccess -Path "\\usnjfs001\h$\$($udl.name)" | Where-object{$_.Account -notlike "*Admins" -and $_.Account -notlike "S-1*" `
         -and $_.Account -notlike "*pa-*" -and $_.Account -notlike "*Users*" -and $_.Account -notlike "NT Authority*" -and $_.Account -notlike "BUILTIN*" `
         -and $_.IsInherited -ne $True -and $_.Account -notlike "*rcurran" -and $_.Account -notlike "*jbilotti" -and $_.Account -notlike "*CREATOR*"}
     
@@ -37,33 +43,6 @@ FoReach ($UDL in $UDTest){
         Write-host "Adding $($Acc2.AccessRights) for $Acc2 to $($Accountnamereplace.Accountname)" -ForegroundColor Green
         Add-NTFSACCESS -Path "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)" -Account $Acc2.Account -AccessRights $Acc2.AccessRights
         
-
-        
-
-    }
-
-    $PermsNew = Get-NTFSACCESS -Path "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)"
-    $PermComp = Compare-object -ReferenceObject $Permsnew.account.accountname -DifferenceObject $Accounts3 | Where-Object{$_.SideIndicator -eq '=>'}
-
-    ForEach($Acc3 in $Accounts3){
-
-        If ($Permcomp.SideIndicator -eq '=>'){
-
-            ForEach($Permcmp in $PermComp){
-
-                #Guarantee add the necessary additional accounts
-                Write-host "Adding $($Permcmp.Inputobject) to $($Accountnamereplace.accountname)" -ForegroundColor Green
-                Add-NTFSaccess -Path "$($UDL.Root)\$($UDL.Parent)\$($AccountNameReplace.AccountName)" -Account $($PermCmp.InputObject) -AccessRights "FullControl"
-
-            }
-
-
-        } else {
-
-            Write-host "No additional Permissions needed" -ForegroundColor Yellow
-
-        }
-
     }
 }
 

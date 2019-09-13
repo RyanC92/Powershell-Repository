@@ -9,7 +9,7 @@ import-module ActiveDirectory
 ForEach($udl in $udrivelist){
 
     #isolate the original owners name / permissions
-    $Accounts = Get-Ntfsaccess -Path "\\usnjfs001\h$\$($udl.name)" | Where{$_.Account -notlike "*Admins" -and $_.Account -notlike "S-1*" `
+    $Accounts = Get-Ntfsaccess -Path "\\usnjfs001\h$\$($udl.name)" | Where-object{$_.Account -notlike "*Admins" -and $_.Account -notlike "S-1*" `
     -and $_.Account -notlike "*pa-*" -and $_.Account -notlike "*Users*" -and $_.Account -notlike "NT Authority*" -and $_.Account -notlike "BUILTIN*" `
     -and $_.IsInherited -ne $True -and $_.Account -notlike "*rcurran" -and $_.Account -notlike "*jbilotti" -and $_.Account -notlike "*CREATOR*"}
     

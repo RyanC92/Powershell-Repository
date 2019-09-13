@@ -52,6 +52,7 @@ if($Location -eq "Meriden" -or $Location -eq "1"){
     if($ExcLoc -eq "Laptop" -or $ExcLoc -eq "1"){
      
         Set-location "OU=Laptops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+        Get-Adcomputer -Filter * -Properties * | Select CN, LastLogonDate, Enabled
         Get-Adcomputer -Filter * -Properties * | Select CN, LastLogonDate, Enabled | Export-csv "C:\CSV\Excelsior_Laptops$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
         Write-Host "Report Has Been Created. It is named Excelsior_Laptops_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
 
@@ -59,12 +60,14 @@ if($Location -eq "Meriden" -or $Location -eq "1"){
     }elseif($ExcLoc -eq "Desktop" -or $ExcLoc -eq "2"){
      
         Set-location "OU=Desktops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+        Get-Adcomputer -Filter * -Properties * | Select CN, LastLogonDate, Enabled 
         Get-Adcomputer -Filter * -Properties * | Select CN, LastLogonDate, Enabled | Export-csv "C:\CSV\Excelsior_Desktops$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
         Write-Host "Report Has Been Created. It is named Excelsior_Desktops_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
 
     }elseif($ExcLoc -eq "All" -or $ExcLoc -eq "3"){
     
         Set-location "OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+        Get-Adcomputer -Filter * -Properties * | Select CN, Created, LastLogonDate, Enabled, LogonCount, Description 
         Get-Adcomputer -Filter * -Properties * | Select CN, Created, LastLogonDate, Enabled, LogonCount, Description | Export-csv "C:\CSV\Excelsior_Computers_All_$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
         Write-Host "Report Has Been Created. It is named Excelsior_computers_all_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
 
