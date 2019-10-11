@@ -55,15 +55,17 @@ ForEach($PC in $PCs){
       #Copy the file to the remote computer
       xcopy $FileToTransfer "\\$($PC.Hostname)\C$\"
 
+      #setup remote session to the current PC in the list
+      PsExec64.exe "\\$($PC.Hostname)" powershell.exe
+
       #remote execute the netsh add for the wireless profile
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan add profile filename=C:\MEDLINE.xml User=All" 
-
-      #remote execute the deletion of the wireless profile XML
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "del C:\MEDLINE.XML"
-
+      "netsh wlan add profile filename=C:\MEDLINE.xml User=All" 
       #remote execute the deletion of the wireless profile
-      PsExec64.exe "\\$($PC.Hostname)" cmd.exe /c "netsh wlan delete profile name=excmed" 
-    
+      "netsh wlan delete profile name=excmed" 
+      
+      #end session
+      Exit
+
     }else{
       Write-Host "$($PC.Hostname) Is Unavailable" -ForegroundColor Red 
       $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append -Notypeinformation
