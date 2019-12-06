@@ -1,8 +1,7 @@
-﻿#OU's
+﻿# OU's
 # OU=Computers,OU=Somerset,OU=North East,OU=Offices,DC=tcco,DC=org
 # OU=Computers,OU=Philadelphia,OU=North Central,OU=Offices,DC=tcco,DC=org
 # OU=Computers,OU=Pittsburgh,OU=North Central,OU=Offices,DC=tcco,DC=org
-# 
 
 #import the module for active directory into Powershell
 Import-module activedirectory
@@ -18,7 +17,7 @@ $local = Get-Location
 #While the path of local is not equal to AD:\ go up a directory and update the location for variable $local
 while($local.path -ne "AD:\"){
 
-cd ..
+Set-Location ..
 
 $local = Get-Location
 $local.path
@@ -34,6 +33,7 @@ Write-Host "Choose the location to go to to pull the report" -ForegroundColor Ye
 Write-Host "1. SOM" -ForegroundColor Yellow
 Write-Host "2. PHI" -ForegroundColor Yellow
 Write-Host "3. PIT" -ForegroundColor Yellow
+Write-Host "4. Enter Your Own OU" -ForegroundColor Yellow
 
 $Location = Read-Host "Location"
 
@@ -62,9 +62,23 @@ if($Location -like "SOM" -or $Location -like "1"){
         Write-Host "Report Has Been Created. It is named Report_PIT_LastLogonDate_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv" -ForegroundColor Green
         
     
+    }elseif($Location -like "4" -or $Location -like "OU"){
+        Write-host "Enter your custom OU (You can get this from the Distinguished Name of an asset) Example: OU=Computers,OU=City,OU=Region,OU=Offices,DC=Company,DC=Org"
+        $CustLoc = Read-host "Location"
+        
+        $Custloc
+        Set-location "$($CustLoc)"
+        Get-Adcomputer -Filter * -Properties * | Select CN, LastLogonDate, Enabled, Description | Export-csv "C:\CSV\Report_Custom_LastLogonDate_$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
+        cls
+        Write-Host "Report Has Been Created. It is named Report_Custom_LastLogonDate_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv" -ForegroundColor Green
+        
+        
     }else{
+
+
+    }
    #if no options selected at beginning, exit
-}
+
 
 #Return to original location to re-execute if needed. 
 Push-Location $Origloc
