@@ -31,8 +31,14 @@ $Choice = $Host.UI.PromptForChoice($Title, $Prompt, $Choices, $Default)
 switch($Choice) 
 {
     
-    0 { Get-adcomputer -filter {Description -like $HNDes -or Name -like $HNDes} -properties * | Select * }
-    1 { Get-Adcomputer -Filter {Description -like $HNDes -or Name -like $HNDes} -properties description }
+    0 { $Type = "All_Properties"
+        $Report = Get-adcomputer -filter {Description -like $HNDes -or Name -like $HNDes} -properties * | Select * 
+        Get-adcomputer -filter {Description -like $HNDes -or Name -like $HNDes} -properties * | Select *
+        }
+    1 { $Type = "Description_Only"
+        $Report = Get-Adcomputer -Filter {Description -like $HNDes -or Name -like $HNDes} -properties description
+        Get-Adcomputer -Filter {Description -like $HNDes -or Name -like $HNDes} -properties description
+        }
     2 { Write-Host "Cancelled" -ForegroundColor Red }
 
 }
@@ -40,7 +46,7 @@ switch($Choice)
 #setup export switch options
 $Title = Write-host "Do you want this information Exported?" -ForegroundColor Green
 $Prompt = "Enter your Choice"
-$Choices = [System.management.Automation.Host.ChoiceDescription[]] @("&Yes","&No","&Cancel")
+$Choices = [System.management.Automation.Host.ChoiceDescription[]] @("&Yes","&No")
 $Default = 1
 $Choice = $Host.UI.PromptForChoice($Title, $Prompt, $Choices, $Default)
 
@@ -52,21 +58,12 @@ switch($Choice)
         0 { Write-host "Select Your Export Directory" -ForegroundColor Yellow -BackgroundColor Black
             $Directory = Get-FolderName            
             
-            Get-adcomputer -filter {Description -like $HNDes -or Name -like $HNDes} -properties * | Select * | `
-            Export-csv "$($Directory)\Report_ADComputer_AllProperties_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation 
-            "Report has been exported to $($Directory)\Report_ADComputer_AllProperties_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
+            $Report | Export-csv "$($Directory)\Report_ADComputer_AllProperties_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation 
+            "Report has been exported to $($Directory)\Report_ADComputer_$($Type)_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
 
             }
 
-        1 { Write-host "Select Your Export Directory" -ForegroundColor Yellow -BackgroundColor Black
-            $Directory = Get-FolderName
-            
-            Get-Adcomputer -Filter {Description -like $HNDes -or Name -like $HNDes} -properties description | `
-            Export-csv "$($Directory)\Report_ADComputer_Description_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation 
-            "Report has been exported to $($Directory)\Report_ADComputer_Description_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
-
+        1 { Write-Host "No Export Option Selected" -ForegroundColor Red 
             }
-
-        2 { Write-Host "No Export Option Selected" -ForegroundColor Red }
 
 }
