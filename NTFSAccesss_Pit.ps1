@@ -23,7 +23,7 @@ $PitRoot = Get-NTFSAccess \\pitfile1\Data
 $PitRoot | Export-csv "$($Directory)\Report_PitFile1_Data_DirPerms_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -NoTypeInformation
 Write-host "NTFS Permissions for $Directory have been exported" -ForegroundColor Green -BackgroundColor Black
 
-Write-host "Getting Childitem list for \\Pitfile1\Data\, Recursion depth of 2, Directory only" -ForegroundColor Yellow -BackgroundColor Black
+Write-host "Getting Childitem list for \\Pitfile1\Data\, Recursion depth of 2, Directory only - This may take a few minutes" -ForegroundColor Yellow -BackgroundColor Black
 #Designate the scan path
 $SubDir = Get-Childitem -Path \\Pitfile1\Data\ -Directory -Recurse -Depth 2
 Write-host "Childitem locations have been collected" -ForegroundColor Green -BackgroundColor Black
