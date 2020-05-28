@@ -4,12 +4,13 @@
 # OU=Computers,OU=Pittsburgh,OU=North Central,OU=Offices,DC=tcco,DC=org
 # OU=Computers,OU=Mahwah,OU=North East,OU=Offices,DC=tcco,DC=org
 
-$MyCredential = new-object psobject -property @{
+<#$MyCredential = new-object psobject -property @{
     Username = $null
     Password = $null
 }
 $Mycredential.Username = Read-host "Enter Username"
 $Mycredential.Password = Read-host "Enter your password"
+#>
 
 #import the module for active directory into Powershell
 Import-module activedirectory
@@ -61,6 +62,9 @@ $Location = Read-Host "Location"
 Write-host "Select Your Export Directory" -ForegroundColor Yellow -BackgroundColor Black
 $Directory = Get-FolderName   
 
+#set i for iterations
+$i = 0
+
 #Run your if variables, if for <location> run the report
 if($Location -like "SOM" -or $Location -like "1"){
 
@@ -70,23 +74,30 @@ if($Location -like "SOM" -or $Location -like "1"){
     "$($PCS.name.count) PCs have been found in this OU... Processing."
 
     ForEach ($PC in $PCS){
-        $tp = Test-Connection -ComputerName $PC -quiet -Count 1
+        #Increment $i from 0 to get a count
+        $i++
+        #Show progress of the count
+        Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
+
+        $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
 
         if($tp -eq $True){
 
             Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
-            wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
-            cls
-            Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-        
+            $Bios = get-wmiobject Win32_bios -Computername $PC.Name -Erroraction SilentlyContinue | Select PSComputerName, __Class, Manufacturer, Serialnumber, Version `
+                |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
+            "Processed $($PC.Name)"
+
         }else{
-            Write-Host "$($PC.Name) is Offline, Skipping"
-            $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
+            Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported."
+            $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
         }
 
     }
-
-
+        
+    Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+    Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+    
     #if not the first location then this (and so on)
     }elseif($Location -like "PHI" -or $Location -like "2") {
 
@@ -96,21 +107,31 @@ if($Location -like "SOM" -or $Location -like "1"){
         "$($PCS.name.count) PCs have been found in this OU... Processing."
 
         ForEach ($PC in $PCS){
-            $tp = Test-Connection -ComputerName $PC -quiet -Count 1
+
+            #Increment $i from 0 to get a count
+            $i++
+            #Show progress of the count
+            Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
+
+            $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
     
             if($tp -eq $True){
                
                 Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
-                wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
-                cls
-                Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+                $Bios = get-wmiobject Win32_bios -Computername $PC.Name -Erroraction SilentlyContinue | Select PSComputerName, __Class, Manufacturer, Serialnumber, Version `
+                    |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
+                "Processed $($PC.Name)"
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping"
-                $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
-    
+        
         }
+                
+        Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        
     }elseif($Location -like "PIT" -or $Location -like "3") {
 
         Set-location "OU=Computers,OU=Pittsburgh,OU=North Central,OU=Offices,DC=tcco,DC=org"
@@ -119,21 +140,31 @@ if($Location -like "SOM" -or $Location -like "1"){
         "$($PCS.name.count) PCs have been found in this OU... Processing."
 
         ForEach ($PC in $PCS){
-            $tp = Test-Connection -ComputerName $PC -quiet -Count 1
+            
+            #Increment $i from 0 to get a count
+            $i++
+            #Show progress of the count
+            Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
+
+            $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
     
             if($tp -eq $True){
                
                 Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
-                wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
-                cls
-                Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-            
+                $Bios = get-wmiobject Win32_bios -Computername $PC.Name -Erroraction SilentlyContinue | Select PSComputerName, __Class, Manufacturer, Serialnumber, Version `
+                    |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
+                "Processed $($PC.Name)"
+
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping"
-                $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
+
         }
-    
+            
+        Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        
     }elseif($Location -like "MAH" -or $Location -like "4"){
 
         Set-location "OU=Computers,OU=Mahwah,OU=North East,OU=Offices,DC=tcco,DC=org"
@@ -142,21 +173,32 @@ if($Location -like "SOM" -or $Location -like "1"){
         "$($PCS.name.count) PCs have been found in this OU... Processing."
 
         ForEach ($PC in $PCS){
-            $tp = Test-Connection -ComputerName $PC -quiet -Count 1
+        
+            #Increment $i from 0 to get a count
+            $i++
+            #Show progress of the count
+            Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
+        
+            $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
     
             if($tp -eq $True){
 
                 Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
-                wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
-                cls
-                Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+                $Bios = get-wmiobject Win32_bios -Computername $PC.Name -Erroraction SilentlyContinue | Select PSComputerName, __Class, Manufacturer, Serialnumber, Version `
+                    |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
+                "Processed $($PC.Name)"
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping"
-                $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
+
+
         }
-    
+                        
+        Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        
     }elseif($Location -like "OU" -or $Location -like "5") {
     
         Write-host "Enter your custom OU (You can get this from the Distinguished Name of an asset) Example: 'OU=Computers,OU=City,OU=Region,OU=Offices,DC=Company,DC=Org'"
@@ -169,21 +211,33 @@ if($Location -like "SOM" -or $Location -like "1"){
         "$($PCS.name.count) PCs have been found in this OU... Processing."
 
         ForEach ($PC in $PCS){
-            $tp = Test-Connection -ComputerName $PC -quiet -Count 1
+            
+            #Increment $i from 0 to get a count
+            $i++
+            #Show progress of the count
+            Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
+            
+            $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
     
             if($tp -eq $True){
                 
                 Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
-                wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\Custom_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
-                cls
-                Write-Host "Report Has Been Created. It is named Custom_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+                $Bios = get-wmiobject Win32_bios -Computername $PC.Name -Erroraction SilentlyContinue | Select PSComputerName, __Class, Manufacturer, Serialnumber, Version `
+                    | Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
+                "Processed $($PC.Name)"
+
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping" -foregroundcolor Red
-                $PC | Export-csv C:\CSV\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
+
+
         }
         
+        Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
+        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+
     }else{
 
 
