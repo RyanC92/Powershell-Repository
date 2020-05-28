@@ -67,11 +67,14 @@ if($Location -like "SOM" -or $Location -like "1"){
     Set-location "OU=Computers,OU=Somerset,OU=North East,OU=Offices,DC=tcco,DC=org"
     $PCS = Get-adcomputer -filter * | Select Name
 
+    "$($PCS.name.count) PCs have been found in this OU... Processing."
+
     ForEach ($PC in $PCS){
         $tp = Test-Connection -ComputerName $PC -quiet -Count 1
 
         if($tp -eq $True){
-           
+
+            Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
             wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
             cls
             Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
@@ -89,12 +92,15 @@ if($Location -like "SOM" -or $Location -like "1"){
 
         Set-location "OU=Computers,OU=Philadelphia,OU=North Central,OU=Offices,DC=tcco,DC=org"
         $PCS = Get-adcomputer -filter * | Select Name
+    
+        "$($PCS.name.count) PCs have been found in this OU... Processing."
 
         ForEach ($PC in $PCS){
             $tp = Test-Connection -ComputerName $PC -quiet -Count 1
     
             if($tp -eq $True){
                
+                Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
                 wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
                 cls
                 Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
@@ -110,11 +116,14 @@ if($Location -like "SOM" -or $Location -like "1"){
         Set-location "OU=Computers,OU=Pittsburgh,OU=North Central,OU=Offices,DC=tcco,DC=org"
         $PCS = Get-adcomputer -filter * | Select Name
 
+        "$($PCS.name.count) PCs have been found in this OU... Processing."
+
         ForEach ($PC in $PCS){
             $tp = Test-Connection -ComputerName $PC -quiet -Count 1
     
             if($tp -eq $True){
                
+                Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
                 wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
                 cls
                 Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
@@ -123,17 +132,21 @@ if($Location -like "SOM" -or $Location -like "1"){
                 Write-Host "$($PC.Name) is Offline, Skipping"
                 $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
             }
+        }
     
     }elseif($Location -like "MAH" -or $Location -like "4"){
 
         Set-location "OU=Computers,OU=Mahwah,OU=North East,OU=Offices,DC=tcco,DC=org"
         $PCS = Get-adcomputer -filter * | Select Name
 
+        "$($PCS.name.count) PCs have been found in this OU... Processing."
+
         ForEach ($PC in $PCS){
             $tp = Test-Connection -ComputerName $PC -quiet -Count 1
     
             if($tp -eq $True){
-               
+
+                Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
                 wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
                 cls
                 Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
@@ -142,8 +155,9 @@ if($Location -like "SOM" -or $Location -like "1"){
                 Write-Host "$($PC.Name) is Offline, Skipping"
                 $PC | Export-csv C:\CSV\FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
             }
+        }
     
-    }elseif($Location -like "OU" -or $Location -like "5"){
+    }elseif($Location -like "OU" -or $Location -like "5") {
     
         Write-host "Enter your custom OU (You can get this from the Distinguished Name of an asset) Example: 'OU=Computers,OU=City,OU=Region,OU=Offices,DC=Company,DC=Org'"
         $CustLoc = Read-host "Location"
@@ -152,19 +166,23 @@ if($Location -like "SOM" -or $Location -like "1"){
         Set-location "$($CustLoc)"
         $PCS = Get-adcomputer -filter * | Select Name
 
+        "$($PCS.name.count) PCs have been found in this OU... Processing."
+
         ForEach ($PC in $PCS){
             $tp = Test-Connection -ComputerName $PC -quiet -Count 1
     
             if($tp -eq $True){
-               
+                
+                Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
                 wmic /user:$($Mycredential.Username) /password:$($Mycredential.password) /node:$PC.name bios get serialnumber |  Export-csv "$($Directory)\Custom_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
                 cls
                 Write-Host "Report Has Been Created. It is named Custom_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping"
+                Write-Host "$($PC.Name) is Offline, Skipping" -foregroundcolor Red
                 $PC | Export-csv C:\CSV\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
             }
+        }
         
     }else{
 
