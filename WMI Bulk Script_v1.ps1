@@ -89,14 +89,14 @@ if($Location -like "SOM" -or $Location -like "1"){
             "Processed $($PC.Name)"
 
         }else{
-            Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported."
-            $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+            Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. "
+            $PC | Export-csv "$($Directory)\SOM_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
         }
 
     }
         
     Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-    Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+    Write-Host "Failed PCs have been exported to $($Directory)\SOM_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
     
     #if not the first location then this (and so on)
     }elseif($Location -like "PHI" -or $Location -like "2") {
@@ -123,14 +123,14 @@ if($Location -like "SOM" -or $Location -like "1"){
                 "Processed $($PC.Name)"
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
-                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. " -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\PHI_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
         
         }
                 
         Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        Write-Host "Failed PCs have been exported to $($Directory)\PHI_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
         
     }elseif($Location -like "PIT" -or $Location -like "3") {
 
@@ -147,7 +147,7 @@ if($Location -like "SOM" -or $Location -like "1"){
             Write-Progress -Activity "Gathering WMIC Information" -Status "Processed: $i of $($PCs.count)"
 
             $tp = Test-Connection -ComputerName $PC.name -quiet -Count 1
-    
+            
             if($tp -eq $True){
                
                 Write-host "$($PC.Name) is live, pulling information" -foregroundcolor Green
@@ -156,14 +156,14 @@ if($Location -like "SOM" -or $Location -like "1"){
                 "Processed $($PC.Name)"
 
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
-                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. " -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\PIT_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
 
         }
             
         Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        Write-Host "Failed PCs have been exported to $($Directory)\PIT_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
         
     }elseif($Location -like "MAH" -or $Location -like "4"){
 
@@ -189,15 +189,15 @@ if($Location -like "SOM" -or $Location -like "1"){
                 "Processed $($PC.Name)"
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
-                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. " -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\MAH_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
 
 
         }
                         
         Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        Write-Host "Failed PCs have been exported to $($Directory)\MAH_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
         
     }elseif($Location -like "OU" -or $Location -like "5") {
     
@@ -228,15 +228,15 @@ if($Location -like "SOM" -or $Location -like "1"){
 
             
             }else{
-                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported." -foregroundcolor Red
-                $PC | Export-csv "$($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+                Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. " -foregroundcolor Red
+                $PC | Export-csv "$($Directory)\Custom_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
             }
 
 
         }
         
         Write-Host "Report Has Been Created. It is named WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv in $($Directory)" -ForegroundColor Green
-        Write-Host "Failed PCs have been exported to $($Directory)\Custom_FailedWMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
+        Write-Host "Failed PCs have been exported to $($Directory)\Custom_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv"
 
     }else{
 
