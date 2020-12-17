@@ -20,6 +20,10 @@ $Comps = Get-FileName
 
 $PCS = Import-csv $Comps
 
+Write-host "What is your IP(VPN if off network) or Hostname" -ForegroundColor Green
+$HN = Read-Host "IP or Hostname"
+
+
 ForEach($PC in $PCS){
 
     $i++ 
@@ -34,7 +38,7 @@ ForEach($PC in $PCS){
     if ($TC -eq $True){
 
         Write-Host "Connecting to $($PC.'Computer Name') and Pulling Serial Number" -ForegroundColor Green
-        psexec -nobanner \\172.16.155.119 -u tcco\rcurran -p Varkeybl92! powershell 
+        psexec -nobanner \\172.16.155.119 -u tcco\rcurran -p  powershell Get-Wmiobject -class win32_bios | Select PSComputername, Serialnumber | Set-Content \\$($HN)\Temp\ServiceTags$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv -append
         $SN = wmic bios get serialnumber
         $HN = Hostname
         $SN | Select @{Name = "Serial Number";Expression = {${$SN.SerialNumber}}}, @{Name = "HostName";Expression = {$HN}} | Set-Content \\SOMLAP0107\C$\Temp\Export.csv
