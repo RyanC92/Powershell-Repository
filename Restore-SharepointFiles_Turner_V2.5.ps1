@@ -43,10 +43,21 @@ switch($opt)
     Write-Host "Please Enter the Sub Directory of the Site to restore from. Ex: Shared Documents or General etc. " -Backgroundcolor Black -ForegroundColor Yellow
     $DirToRe = Read-Host "Sub Directory"
     "You Entered $($DirToRe)"
+$Restoreset = Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 
+$i = 0
+    Foreach($Resto in $restoreset){
+        $i++  
+        Write-Progress -Activity "Updating Descriptions" -Status "Updating: $i of $($Restoreset.count)"
+        Write-Host "Restoring $($Resto.title)"
+        $checkfile = Get-pnpfile $Resto.Dirname 
+            #restore items - 5000 item limit
+            $resto |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Restore-PnpRecyclebinItem -Force
+        }
+        catch {
+            Write-Error "Unable to Restore"     
+        }
 
-    #restore items - 5000 item limit
-    Get-PNPRecyclebinitem |  Foreach-object {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Restore-PnpRecyclebinItem -Force
-
+    }
 }
 2 { 
     Write-Host "Both" -ForegroundColor Green
