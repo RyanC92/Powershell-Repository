@@ -1,10 +1,8 @@
-#Rename Computer based on set prefix (replace the 2 values in )
+#Rename Computer based on set prefix (replace the 2 values in Preold and Prenew )
 
-$Domain = tcco.org
 $hn = hostname
-#$cred = get-credential
-$PreOld = ''
-$PreNew = ''
+$PreOld = 'mah'
+$PreNew = 'TSI'
 
     $hnNew = $hn.replace("$($PreOld)","$($PreNew)")
     Rename-Computer -NewName $hnNew  -Restart
