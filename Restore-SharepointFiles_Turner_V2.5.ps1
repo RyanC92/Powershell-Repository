@@ -77,6 +77,7 @@ $i = 0
 }
 3 {Write-Host "Quit" -ForegroundColor Green}
 }
+}
 
 
 <#

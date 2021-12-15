@@ -10,7 +10,7 @@ Foreach ($User in $Users){
     if($($User.Description) -ne ($User.Title)){
 
         Write-Host "Updating $($User.Name) from $($User.Description) to $($User.Title)" -ForegroundColor Green
-        Set-aduser -identity "$($User.SamAccountName)" -Title "$($User.Title)" -whatif
+        Set-aduser -identity "$($User.SamAccountName)" -Description $($User.Title) #-whatif
 
     }else {
 

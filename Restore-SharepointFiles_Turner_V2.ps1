@@ -2,7 +2,7 @@
 cls
 Write-Host "Please Enter The URL For The Site to Connect to. Ex: https://tcco.sharepoint.com/sites/advertising" -Backgroundcolor Black -ForegroundColor Yellow
 $RestoreSite = Read-Host "URL"
-connect-pnponline -url "$($RestoreSite)"
+connect-pnponline -url "$($RestoreSite)" -interactive
 $today = (Get-Date)
 Write-host "How many days back do you need to restore?" -Backgroundcolor Black -ForegroundColor Yellow
 $BackDate = Read-Host "Go Back How Many Days?"
@@ -31,7 +31,7 @@ switch($opt)
     $DirToRe = Read-Host "Sub Directory"
     "You Entered $($DirToRe)"
 
-    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Export-Csv c:\temp\restore.csv
+    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4000 | Export-Csv c:\temp\restore.csv
 
     }
 1 { 
@@ -45,7 +45,7 @@ switch($opt)
     "You Entered $($DirToRe)"
 
     #restore items - 5000 item limit
-    Get-PNPRecyclebinitem |  Foreach-object {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Restore-PnpRecyclebinItem -Force
+    Get-PNPRecyclebinitem |  Foreach-object {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4000 | Restore-PnpRecyclebinItem -Force
 
 }
 2 { 
@@ -59,9 +59,9 @@ switch($opt)
     "You Entered $($DirToRe)"
 
     #export items - 5000 Item Limit
-    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Export-Csv c:\temp\restore.csv
+    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$($UserDelby)*") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4000 | Export-Csv c:\temp\restore.csv
     #restore items - 5000 item limit
-    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq "$($UserDelby)") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4998 | Restore-PnpRecyclebinItem -Force
+    Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$($UserDelby)*") -and ($_.Dirname -like "*$($DirToRe)*")}  | select -last 4000 | Restore-PnpRecyclebinItem -Force
 
 }
 3 {Write-Host "Quit" -ForegroundColor Green}
@@ -69,10 +69,10 @@ switch($opt)
 
 
 <#
-Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq 'deanna.broussard@perryhomes.com') -and ($_.Dirname -like 'Shared Documents or General etc. ')}  | select -last 4998 | Export-Csv c:\temp\restore.csv
+Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq 'deanna.broussard@perryhomes.com') -and ($_.Dirname -like 'Shared Documents or General etc. ')}  | select -last 4000 | Export-Csv c:\temp\restore.csv
 
 #restore items - 5000 item limit
-Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq 'deanna.broussard@perryhomes.com') -and ($_.Dirname -like 'Shared Documents or General etc. ')}  | select -last 4998 | Restore-PnpRecyclebinItem -Force
+Get-PNPRecyclebinitem |  ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -eq 'deanna.broussard@perryhomes.com') -and ($_.Dirname -like 'Shared Documents or General etc. ')}  | select -last 4000 | Restore-PnpRecyclebinItem -Force
 #>
 
 
