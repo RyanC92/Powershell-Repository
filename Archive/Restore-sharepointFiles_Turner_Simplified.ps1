@@ -2,9 +2,12 @@
 $errorOccured = $False
 try { 
     Get-installedmodule -name Microsoft.Online.Sharepoint.Powershell 
-    $errorOccured = $true
+    $errorOccured = $False
 }
-catch { Install-Module SharePointPnPPowerShellOnline }
+catch { 
+    Install-Module SharePointPnPPowerShellOnline
+    $errorOccured = $True
+}
 if(!$errorOccured) {
     "Sharepoint Module Is Already Installed."
 }
