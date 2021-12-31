@@ -1,3 +1,14 @@
+# Self-elevate the script if required
+"Checking to for an elevated powershell session (Administrator)"
+if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+    if ([int](Get-CimInstance -Class Win32_OperatingSystem | Select-Object -ExpandProperty BuildNumber) -ge 6000) {
+     $CommandLine = "-File `"" + $MyInvocation.MyCommand.Path + "`" " + $MyInvocation.UnboundArguments
+     Start-Process -FilePath PowerShell.exe -Verb Runas -ArgumentList $CommandLine
+     Exit
+    }
+   }
+
+
 <#Description:
 Restore sharepoint online files that were previously deleted by a singular user
 This process is not fast (about 1-2 files per second) but it'll do the job.
@@ -18,48 +29,98 @@ $loop = 1
 #Check if the old sharepoint module is installed if so, uninstall it then check for the PnP Powershell Module is installed, if not install it
 if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
     Write-Host "Removing the Microsoft.Online.SharePoint.Powershell Module as it's a legacy module and has been replaced by PnP.Powershell - This process should run once but may take a few minutes (This requires powershell to be run as an Administrator)" -ForegroundColor Green
-    Uninstall-Module -name Microsoft.Online.Sharepoint.Powershell -force
+    
+    Uninstall-Module -name Microsoft.Online.Sharepoint.Powershell -force -ErrorAction SilentlyContinue
     Install-module -name pnp.powershell -Force
+    
 }elseif(Get-Module  -ListAvailable -name PnP.Powershell){
-    Write-Host "PnP Powershell Module is Installed, checking for updates" -ForegroundColor Green
-    update-module -name pnp.powershell 
+    Write-Host "PnP Powershell Module is Installed, checking for updates - This may take a few minutes.`n
+    Note: You may have to press Enter to continue." -ForegroundColor Green
+
+    $pnp = Get-module -ListAvailable -name Pnp.Powershell | Select Version
+    "Your PnP.Powershell Version is: $($pnp.version)"
+
+    $verCheck = Find-module -name pnp.powershell -Repository PSGallery | select Version
+    "The Current Version of PnP.Powershell is: $($verCheck.Version). If they are equal, it will skip"
+    
+        if ($verCheck.version -gt $pnp.version){
+            update-module -name pnp.powershell
+        }else{
+            "Your Version is up to date, moving on."
+        }
+             
 }else{
     Write-Host "PnP Powershell Module isn't installed, Installing now. This may take a few minutes (This requires powershell to be run as an Administrator)" -ForegroundColor Green
     Install-module -name pnp.powershell
 }
 
 #Prompt for questions
-$SPURL = Read-host "Please enter the URL of the site. Example: https://tcco.sharepoint.com/sites/SiteName `n `
+do {
+    
+    $SPURL = Read-host "Please enter the URL of the site. Example: https://tcco.sharepoint.com/sites/SiteName `n `
     Site URL"
 
+    if ($SPURL -eq "") {
+        cls
+        Write-Host "No input detected, please try again..."
+        }else{
+        }
+}while ($SPURL -eq "")
+cls
+
 #Connect to SPOnline using the interactive window for MFA
-Write-Host "Connecting to Sharepoint Online, Please authenticate through the pop-up window"
+Write-Host "Connecting to Sharepoint Online site: $SPURL, Please authenticate through the pop-up window"
 Connect-Pnponline -url "$SPURL" -interactive
 
-$delBy = Read-host "Please enter the email address of the user who deleted the items `n
-    Email Address"
 
 do {
-    $inputValid = [int]::TryParse((Read-Host "Please enter how many days back from today you would like to go. If its to restore today, type 0 `n
+    
+    $delBy = Read-host "Please enter the email address of the user who deleted the items `n
+    Email Address"
+
+    if ($delBy -eq "") {
+        cls
+        Write-Host "No input detected, please try again..."
+        }else{
+        }
+}while ($delBy -eq "")
+cls
+
+"Connected to: $SPURL"
+"Searching by Deleted by Address: $delBy `n"
+
+do {
+    $searchDate = [int]::TryParse((Read-Host "Please enter how many days back from today you would like to go. If its to restore today, type 0 `n
         Days"), [ref]$backDate)
 
-    if (-not $inputValid) {
-    Write-Host "your input was not an number, please try again..."
+    if (-not $searchDate) {
+        cls
+        Write-Host "your input was not an number, please try again..."
     }else{
 
     }
-} while (-not $inputValid)
+} while (-not $searchDate)
+cls
 
 #Get todays date and subtract the backdays to get the date desired
 $restoredate = ((Get-Date).Date.AddDays(-$backDate))
 
-Write-host "Looking back $backDate days"
+"Connected to: $SPURL"
+"Searching by Deleted By Address: $delBy"
+"Searching back: $backDate Days"
+"Restore Date is set as: $restoreDate `n"
 
 #Do a while loop until a number is submitted at or under 4998 items
 DO{
     $qSize = Read-Host "How many items would you like per cycle. Note: Maximum limit per cycle is 4998 items `n
     Items"
 }while ($qSize -lt '0' -AND $qSize -gt '4998')
+
+"Connected to: $SPURL"
+"Searching by Deleted By Address: $delBy"
+"Searching back: $backDate Days"
+"Restore Date is set as: $restoreDate"
+"Query Size: $qSize `n"
 
 $Title = ""
 $Info = Write-host "Final Question: Is there a specific directory to restore from?" -Foregroundcolor Yellow -Backgroundcolor Black
