@@ -17,11 +17,12 @@ $loop = 1
 
 #Check if the old sharepoint module is installed if so, uninstall it then check for the PnP Powershell Module is installed, if not install it
 if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
-    Write-Host "Removing the Microsoft.Online.SharePoint.Powershell Module as it's a legacy module and has been replaced by PnP.Powershell" -ForegroundColor Green
+    Write-Host "Removing the Microsoft.Online.SharePoint.Powershell Module as it's a legacy module and has been replaced by PnP.Powershell - This process should run once but may take a few minutes (This requires powershell to be run as an Administrator)" -ForegroundColor Green
     Uninstall-Module -name Microsoft.Online.Sharepoint.Powershell -force
     Install-module -name pnp.powershell -Force
 }elseif(Get-Module  -ListAvailable -name PnP.Powershell){
-    Write-Host "PnP Powershell Module is Installed, Skipping Install" -ForegroundColor Green
+    Write-Host "PnP Powershell Module is Installed, checking for updates" -ForegroundColor Green
+    update-module -name pnp.powershell 
 }else{
     Write-Host "PnP Powershell Module isn't installed, Installing now. This may take a few minutes (This requires powershell to be run as an Administrator)" -ForegroundColor Green
     Install-module -name pnp.powershell
@@ -44,6 +45,8 @@ do {
 
     if (-not $inputValid) {
     Write-Host "your input was not an number, please try again..."
+    }else{
+
     }
 } while (-not $inputValid)
 
@@ -79,7 +82,7 @@ switch($opt)
         Foreach ($ID in $RecycleBinitems){
             
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
-            "Restoring $($ID.Title)"
+            #"Restoring $($ID.Title)"
             
             Try{ 
                 Restore-PnPRecycleBinItem -Identity "$($ID.ID)"-force
@@ -106,7 +109,7 @@ switch($opt)
         Foreach ($ID in $RecycleBinitems){
             
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
-            "Restoring $($ID.Title)"
+            #"Restoring $($ID.Title)"
             
             Try{ 
                 Restore-PnPRecycleBinItem -Identity "$($ID.ID)"-force
