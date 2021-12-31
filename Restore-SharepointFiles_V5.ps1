@@ -32,15 +32,15 @@ if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
     
     Uninstall-Module -name Microsoft.Online.Sharepoint.Powershell -force -ErrorAction SilentlyContinue
     Install-module -name pnp.powershell -Force
-    
+
 }elseif(Get-Module  -ListAvailable -name PnP.Powershell){
-    Write-Host "PnP Powershell Module is Installed, checking for updates - This may take a few minutes.`n
-    Note: You may have to press Enter to continue." -ForegroundColor Green
+    #Write-Host "PnP Powershell Module is Installed, checking for updates - This may take a few minutes.`n
+    #Note: You may have to press Enter to continue." -ForegroundColor Green
 
     $pnp = Get-module -ListAvailable -name Pnp.Powershell | Select Version
-    "Your PnP.Powershell Version is: $($pnp.version)"
+    "Your PnP.Powershell Version is: $($pnp.version), if it is sub version 1.9. Please run 'update-module -name pnp.powershell'"
 
-    $verCheck = Find-module -name pnp.powershell -Repository PSGallery | select Version
+    <#$verCheck = Find-module -name pnp.powershell -Repository PSGallery | select Version
     "The Current Version of PnP.Powershell is: $($verCheck.Version). If they are equal, it will skip"
     
         if ($verCheck.version -gt $pnp.version){
@@ -48,6 +48,7 @@ if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
         }else{
             "Your Version is up to date, moving on."
         }
+    #>
              
 }else{
     Write-Host "PnP Powershell Module isn't installed, Installing now. This may take a few minutes (This requires powershell to be run as an Administrator)" -ForegroundColor Green
@@ -115,6 +116,7 @@ DO{
     $qSize = Read-Host "How many items would you like per cycle. Note: Maximum limit per cycle is 4998 items `n
     Items"
 }while ($qSize -lt '0' -AND $qSize -gt '4998')
+cls
 
 "Connected to: $SPURL"
 "Searching by Deleted By Address: $delBy"
@@ -143,7 +145,7 @@ switch($opt)
         Foreach ($ID in $RecycleBinitems){
             
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
-            #"Restoring $($ID.Title)"
+            "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
             Try{ 
                 Restore-PnPRecycleBinItem -Identity "$($ID.ID)"-force
@@ -157,7 +159,10 @@ switch($opt)
             $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} | select -last $qSize
             $i=0
             $loop++ 
-    }
+    }$total = $qsize * $loop
+    "Restore is complete. `n
+    Restored $total files over $loop loops" 
+    pause
 }
 1 { 
     Write-host "Skipping the Sub Directory and moving on to the restore" -ForegroundColor Green
@@ -170,7 +175,7 @@ switch($opt)
         Foreach ($ID in $RecycleBinitems){
             
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
-            #"Restoring $($ID.Title)"
+            "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
             Try{ 
                 Restore-PnPRecycleBinItem -Identity "$($ID.ID)"-force
@@ -184,7 +189,10 @@ switch($opt)
             $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} | select -last $qSize
             $i=0
             $loop++ 
-    }
+    }$total = $qsize * $loop
+    "Restore is complete. `n
+    Restored $total files over $loop loops" 
+    pause
 }
 2 { Write-Host "Exit" -ForegroundColor Red}
 }
