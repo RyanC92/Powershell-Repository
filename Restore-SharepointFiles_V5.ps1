@@ -23,7 +23,7 @@ Author: Ryan Curran
 
 #initialize variables
 $backDate = '0'
-$i = 0
+$i = 1
 $loop = 1
 
 #Check if the old sharepoint module is installed if so, uninstall it then check for the PnP Powershell Module is installed, if not install it
