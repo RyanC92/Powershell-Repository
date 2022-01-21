@@ -185,13 +185,14 @@ switch($opt)
             }Catch{
                 Write-host "$($ID.Title) Errored Out. This could be because the file already exists and will not overwrite." -ForegroundColor Red -BackgroundColor Black
             }
+            $total += $i
         }
     
             #re-query the recycling bin for the next set of items, reset $i and increment $loop for tracking
             $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} | select -last $qSize
             $i=0
             $loop++ 
-    }$total = $qsize * $loop
+    }
     "Restore is complete. `n
     Restored $total files over $loop loops" 
     pause
