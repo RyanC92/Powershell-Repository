@@ -1,8 +1,6 @@
 Import-module activedirectory
 
-# OU=Laptops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com
-# OU=Desktops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com
-# OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+
 
 
 Set-location AD:
@@ -32,20 +30,20 @@ $Location = Read-Host "Location"
 
 if($Location -eq "Excelsior Laptops" -or $Location -eq "2") {
  
-    Set-location "OU=Laptops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+    Set-location ""
     Get-Adcomputer -Filter * -Properties * | Select Name, OperatingSystem | Export-csv "C:\CSV\Excelsior_Laptops$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
     Write-Host "Report Has Been Created. It is named Excelsior_Laptops_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
     
     #if a desktop run script
 }elseif($Location -eq "Excelsior Desktops" -or $Location -eq "1"){
          
-    Set-location "OU=Desktops,OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+    Set-location ""
     Get-Adcomputer -Filter * -Properties * | Select Name, OperatingSystem | Export-csv "C:\CSV\Excelsior_Desktops$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
     Write-Host "Report Has Been Created. It is named Excelsior_Desktops_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
     
 }elseif($Location -eq "All" -or $Location -eq "3"){
         
-    Set-location "OU=US_Excelsior_Medical_Neptune_NJ,OU=Users_And_Computers,DC=medline,DC=com"
+    Set-location ""
     Get-Adcomputer -Filter * -Properties * | Select Name, OperatingSystem | Export-csv "C:\CSV\Excelsior_Computers_All_$([DateTime]::Now.ToString("MM-dd-yyyy-hh.mm.ss")).csv" -NoTypeInformation
     Write-Host "Report Has Been Created. It is named Excelsior_computers_all_$([DateTime]::Now.ToSTring("MM-dd-yyyy-hh.mm.ss")).csv"
     
