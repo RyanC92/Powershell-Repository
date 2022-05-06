@@ -1,4 +1,4 @@
-$Users = Get-aduser -filter * -SearchBase "OU=Users,OU=Somerset,OU=North East,OU=Offices,DC=tcco,DC=org" -properties Displayname
+$Users = Get-aduser -filter * -SearchBase "" -properties Displayname
 
 $dpOld = '(SOM)'
 $dpNew = '(NJ)'

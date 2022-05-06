@@ -57,7 +57,7 @@ if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
 #Prompt for questions
 do {
     
-    $SPURL = Read-host "Please enter the URL of the site. Example: https://tcco.sharepoint.com/sites/SiteName `n `
+    $SPURL = Read-host "Please enter the URL of the site. Example: https://sharepoint.com/sites/SiteName `n `
     Site URL"
 
     if ($SPURL -eq "") {
