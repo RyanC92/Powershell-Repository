@@ -8,4 +8,4 @@ $PreNew = 'njo'
     $hnNew.ToUpper()
     Rename-Computer -NewName $hnNew  -Force
 
-pause
+Start-sleep -s 3
