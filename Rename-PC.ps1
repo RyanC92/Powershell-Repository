@@ -1,8 +1,11 @@
 #Rename Computer based on set prefix (replace the 2 values in Preold and Prenew )
 
 $hn = hostname
-$PreOld = 'mah'
-$PreNew = 'TSI'
+$PreOld = 'som'
+$PreNew = 'njo'
 
     $hnNew = $hn.replace("$($PreOld)","$($PreNew)")
-    Rename-Computer -NewName $hnNew  -Restart
+    $hnNew.ToUpper()
+    Rename-Computer -NewName $hnNew  -Force
+
+pause
