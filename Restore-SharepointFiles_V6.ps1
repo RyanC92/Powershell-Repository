@@ -146,6 +146,8 @@ switch($opt)
     
         Foreach ($ID in $RecycleBinitems){
             
+            $loop++
+
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
             "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
@@ -159,12 +161,9 @@ switch($opt)
     
             #re-query the recycling bin for the next set of items, reset $i and increment $loop for tracking
             $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} | select -last $qSize
-            $i=0
-            $loop++ 
-    }$total = $qsize * $loop
-    "Restore is complete. `n
-    Restored $total files over $loop loops" 
-    pause
+            $i=1 
+            $total += $Recyclebinitems.count
+    }
 }
 1 { 
     Write-host "Skipping the Sub Directory and moving on to the restore" -ForegroundColor Green
@@ -176,6 +175,8 @@ switch($opt)
     
         Foreach ($ID in $RecycleBinitems){
             
+            $loop++
+
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
             "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
@@ -189,12 +190,11 @@ switch($opt)
     
             #re-query the recycling bin for the next set of items, reset $i and increment $loop for tracking
             $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} | select -last $qSize
-            $i=0
-            $loop++ 
-    }$total = $qsize * $loop
-    "Restore is complete. `n
-    Restored $total files over $loop loops" 
-    pause
+            $i=1 
+            $total += $Recyclebinitems.count
+    }
 }
 2 { Write-Host "Exit" -ForegroundColor Red}
-}
+}    "`n Restore is complete. `n
+Restored $total files or folders over $loop loops (Numbers may not accurately portray real count as it is counting folders which may contain files and not account for the individual files)" 
+pause
