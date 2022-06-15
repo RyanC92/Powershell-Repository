@@ -16,13 +16,10 @@ catch { Install-Module SharePointPnPPowerShellOnline }
 if(!$errorOccured) {
     "Sharepoint Module Is Already Installed."
 }
-# Credit to : https://lazyadmin.nl/powershell/restore-recycle-bin-sharepoint-online-with-powershell/
-# Refer to link for help with filtering by user or data.
-
 
 #CHANGE FOLLOWING VARIABLES TO MATCH YOUR ENVIRONMENT
 # YOUR SHAREPOINT SITE
-$siteUrl = "https://tcco.sharepoint.com/sites/PANJFinance518"
+$siteUrl = "
 # The Folder to Restore - Full Path
 $directoryToRestore = 'Shared Documents\General'
 
