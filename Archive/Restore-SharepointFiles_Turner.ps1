@@ -1,6 +1,6 @@
 #Modify the URL For the site you are working with.
 
-connect-pnponline -url https://tcco.sharepoint.com/sites/TestTeams-Ryan
+connect-pnponline -url 
 $today = (Get-Date)
 $restoreDate = $today.date.AddDays(-7)
 

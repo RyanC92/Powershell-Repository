@@ -1,6 +1,6 @@
 #Modify the URL For the site you are working with.
 cls
-Write-Host "Please Enter The URL For The Site to Connect to. Ex: https://tcco.sharepoint.com/sites/advertising" -Backgroundcolor Black -ForegroundColor Yellow
+Write-Host "Please Enter The URL For The Site to Connect to. Ex: " -Backgroundcolor Black -ForegroundColor Yellow
 $RestoreSite = Read-Host "URL"
 connect-pnponline -url "$($RestoreSite)"
 $today = (Get-Date)
