@@ -1,6 +1,6 @@
 #Restore for Sharon Rowles
 
-Connect-Pnponline -url https://tcco.sharepoint.com/sites/PANJFinance518 -interactive
+Connect-Pnponline -url  -interactive
 
 $restoredate = ((Get-Date).Date.AddDays(-0))
 
