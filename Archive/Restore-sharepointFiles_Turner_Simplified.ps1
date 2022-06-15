@@ -13,12 +13,12 @@ if(!$errorOccured) {
 }
 
 
-connect-pnponline -url https://tcco.sharepoint.com/sites/PANJFinance518 -interactive
+connect-pnponline -url  -interactive
 $today = (Get-Date)
 $restoreDate = $today.date.AddDays(-0)
 
-$RecylceBinItems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*srowles@tcco.com*")} | select -last 4998
-$RecycleBinitemsNL = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*srowles@tcco.com*")}
+$RecylceBinItems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "**")} | select -last 4998
+$RecycleBinitemsNL = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "**")}
 
 #Get list of items to be restored - 5000 item limit
 $RecylceBinItems | Export-Csv c:\temp\restore.csv -NoTypeInformation
