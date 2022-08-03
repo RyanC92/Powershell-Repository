@@ -21,8 +21,6 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
    }
 
 
-
-
 #initialize variables
 $backDate = '0'
 $i = 1
