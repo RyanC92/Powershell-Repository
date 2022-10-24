@@ -137,15 +137,15 @@ switch($opt)
 
     Write-host "Beginning restore" -ForegroundColor Green
     #Get initial recycle bin items
-    $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} | select -last $qSize
+    $RecycleBinitems = Get-PnPRecycleBinItem -RowLimit $qSize | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} 
     
     
     While($($RecycleBinitems.count) -notlike "0"){
-    
+
+        $loop++  
+
         Foreach ($ID in $RecycleBinitems){
             
-            $loop++
-
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
             "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
@@ -158,7 +158,7 @@ switch($opt)
         }
     
             #re-query the recycling bin for the next set of items, reset $i and increment $loop for tracking
-            $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} | select -last $qSize
+            $RecycleBinitems = Get-PnPRecycleBinItem -RowLimit $qSize | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*") -and ($_.DirName -like "*$DirToRe*")} 
             $i=1 
             $total += $Recyclebinitems.count
     }
@@ -166,15 +166,14 @@ switch($opt)
 1 { 
     Write-host "Skipping the Sub Directory and moving on to the restore" -ForegroundColor Green
     #Get initial recycle bin items
-    $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} | select -last $qSize
-    
+    $RecycleBinitems = Get-PnPRecycleBinItem -RowLimit $qSize | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} 
     
     While($($RecycleBinitems.count) -notlike "0"){
-    
+
+        $loop++
+
         Foreach ($ID in $RecycleBinitems){
             
-            $loop++
-
             Write-Progress -Activity "Restoring Files" -Status "Updating: $i of $($RecycleBinitems.count) of Loop $Loop"
             "Restoring $($ID.Title). File $i of $($RecyclebinItems.Count) of Loop $Loop"
             
@@ -187,7 +186,7 @@ switch($opt)
         }
     
             #re-query the recycling bin for the next set of items, reset $i and increment $loop for tracking
-            $RecycleBinitems = Get-PnPRecycleBinItem | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} | select -last $qSize
+            $RecycleBinitems = Get-PnPRecycleBinItem -RowLimit $qSize | ? {($_.DeletedDate -gt $restoreDate) -and ($_.DeletedByEmail -like "*$delBy*")} 
             $i=1 
             $total += $Recyclebinitems.count
     }
