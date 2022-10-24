@@ -35,69 +35,76 @@ function Update-EveryModule {
     )
     # Get all installed modules that have a newer version available
     Write-Verbose "Checking all installed modules for available updates."
-    $CurrentModules = Get-InstalledModule | Where-Object { $ExcludedModules -notcontains $_.Name -and $_.repository -eq "PSGallery" }
+    $CurrentModules = Get-InstalledModule | Where-Object { $ExcludedModules -notcontains $CurrentModule.Name -and $CurrentModule.repository -eq "PSGallery" }
 
     # Walk through the Installed modules and check if there is a newer version
-    $CurrentModules | ForEach-Object {
-        Write-Verbose "Checking $($_.Name)"
-        Try {
-            $GalleryModule = Find-Module -Name $_.Name -Repository PSGallery -ErrorAction Stop
+    foreach ( $CurrentModule in $CurrentModules) {
+        Write-Verbose "Checking $($CurrentModule.Name)"
+        try {
+            $GalleryModule = Find-Module -Name $CurrentModule.Name -Repository PSGallery -ErrorAction Stop
         }
-        Catch {
-            Write-Error "Module $($_.Name) not found in gallery $_"
+        catch {
+            Write-Error "Module $($CurrentModule.Name) not found in gallery $CurrentModule"
             $GalleryModule = $null
         }
-        if ($GalleryModule.Version -gt $_.Version) {
-            if ($SkipMajorVersion -and $GalleryModule.Version.Split('.')[0] -gt $_.Version.Split('.')[0]) {
-                Write-Warning "Skipping major version update for module $($_.Name). Galleryversion: $($GalleryModule.Version), local version $($_.Version)"
+        try {
+            $CurrentVersion = [System.Version]::New("$($CurrentModule.Version)")           
+            $GalleryVersion = [System.Version]::New("$($GalleryModule.Version)")
+        }
+        catch {
+            $GalleryVersion = $null
+        }
+        if ($GalleryVersion -gt $CurrentVersion) {
+            if ($SkipMajorVersion -and $GalleryModule.Version.Split('.')[0] -gt $CurrentModule.Version.Split('.')[0]) {
+                Write-Warning "Skipping major version update for module $($CurrentModule.Name). Galleryversion: $($GalleryModule.Version), local version $($CurrentModule.Version)"
             }
             else {
-                Write-Verbose "$($_.Name) will be updated. Galleryversion: $($GalleryModule.Version), local version $($_.Version)"
+                Write-Verbose "$($CurrentModule.Name) will be updated. Galleryversion: $($GalleryModule.Version), local version $($CurrentModule.Version)"
                 try {
                     if ($PSCmdlet.ShouldProcess(
-                        ("Module {0} will be updated to version {1}" -f $_.Name, $GalleryModule.Version),
-                            $_.Name,
+                        ("Module {0} will be updated to version {1}" -f $CurrentModule.Name, $GalleryModule.Version),
+                            $CurrentModule.Name,
                             "Update-Module"
                         )
                     ) {
-                        Update-Module $_.Name -ErrorAction Stop -Force
-                        Write-Verbose "$($_.Name)  has been updated"
+                        Update-Module $CurrentModule.Name -ErrorAction Stop -Force
+                        Write-Verbose "$($CurrentModule.Name)  has been updated"
                     }
                 }
-                Catch {
-                    Write-Error "$($_.Name) failed: $_ "
+                catch {
+                    Write-Error "$($CurrentModule.Name) failed: $CurrentModule "
                     continue
 
                 }
                 if ($KeepOldModuleVersions -ne $true) {
-                    Write-Verbose "Removing old module $($_.Name)"
-                    if ($ExcludedModulesforRemoval -contains $_.Name) {
+                    Write-Verbose "Removing old module $($CurrentModule.Name)"
+                    if ($ExcludedModulesforRemoval -contains $CurrentModule.Name) {
                         Write-Verbose "$($allversions.count) versions of this module found [ $($module.name) ]"
                         Write-Verbose "Please check this manually as removing the module can cause instabillity."
                     }
                     else {
                         try {
                             if ($PSCmdlet.ShouldProcess(
-                                ("Old versions will be uninstalled for module {0}" -f $_.Name),
-                                    $_.Name,
+                                ("Old versions will be uninstalled for module {0}" -f $CurrentModule.Name),
+                                    $CurrentModule.Name,
                                     "Uninstall-Module"
                                 )
                             ) {
-                                Get-InstalledModule -Name $_.Name -AllVersions
-                                | Where-Object { $_.version -ne $GalleryModule.Version }
+                                Get-InstalledModule -Name $CurrentModule.Name -AllVersions
+                                | Where-Object { $CurrentModule.version -ne $GalleryModule.Version }
                                 | Uninstall-Module -Force -ErrorAction Stop
-                                Write-Verbose "Old versions of $($_.Name) have been removed"
+                                Write-Verbose "Old versions of $($CurrentModule.Name) have been removed"
                             }
                         }
                         catch {
-                            Write-Error "Uninstalling old module $($_.Name) failed: $_"
+                            Write-Error "Uninstalling old module $($CurrentModule.Name) failed: $_"
                         }
                     }
                 }
             }
         }
         elseif ($null -ne $GalleryModule) {
-            Write-Verbose "$($_.Name) is up to date"
+            Write-Verbose "$($CurrentModule.Name) is up to date"
         }
     }
 }
