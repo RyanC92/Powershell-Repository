@@ -9,7 +9,7 @@ $UnsecurePassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($B
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $AdminAccount, $SecurePassword
 
 #Enable PS Remoting
-#C:\Users\hsheldon\Desktop\Software\PSTools\Psexec.exe \\$Computer -u $AdminAccount -p $UnsecurePassword -h -d powershell.exe "enable-psremoting -force"
+.\psexec\Psexec.exe \\$Computer -u $AdminAccount -p $UnsecurePassword -h -d powershell.exe "enable-psremoting -force"
 
 # Repair secure Channel
 Write-Host "Resetting computer secure channel..."
