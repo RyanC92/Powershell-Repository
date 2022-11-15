@@ -7,7 +7,7 @@ $Users = Get-aduser -filter * -Searchbase "$OU" -properties Title, Description |
 
 $countChange = 0
 $countSame = 0
-$countTotal = 0
+
 Foreach ($User in $Users){
 
     if($($User.Description) -ne ($User.Title)){
@@ -20,11 +20,10 @@ Foreach ($User in $Users){
         Write-Host "$($User.Name)'s description ($($User.Description)) is accurate to their title ($($User.Title)), No changes have been made. `n" -ForegroundColor Yellow
         $countSame++
     }
-    $countTotal++ 
 }
 
 Write-host "===" -ForegroundColor Red
-Write-host "Out of a total of $countTotal processed employees in $OU `n
+Write-host "Out of a total of $($Users.count) processed employees in $OU `n
 $countChange employee titles updated `n
 $countSame employee titles that went unchanged." -ForegroundColor Green
 Write-Host "===" -ForegroundColor Red
