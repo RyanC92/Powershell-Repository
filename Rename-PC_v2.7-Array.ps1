@@ -3,11 +3,11 @@ $cred = Get-Credential
 $NJOLTS = get-adcomputer -filter {(Name -like "NJOLAP*")} | Select-Object Name
 
 $i = 1
-
+$j = 0
 foreach($ip in $iprange){
     '-------------'
     "Processing: $i"
-    $IPaddr = "172.18.47.$ip"
+    $IPaddr = "172.22.47.$ip"
     $Online = Test-Connection -IPAddress $IPAddr -Quiet -count 1
     "Testing Result: Online is $online"
 
@@ -42,7 +42,7 @@ foreach($ip in $iprange){
                     Rename-computer -Computername $IPAddr -NewName "$NewComputerName" -DomainCredential $Cred
                     
                     Write-host "Renaming to $NewComputerName Completed!" -foreground Yellow -BackgroundColor Black
-
+                    j++
 
                     # $StartDate = (GET-DATE)
                     # $EndDate = [datetime]"17:00"
@@ -84,4 +84,5 @@ $NEWLTS2 = get-adcomputer -filter {(Name -like "NJOLAP*") -and (Enabled -eq $Tru
 ' ------------------------------------------------------- '
 "| There are $($OLDLTS2.Count) Old Computers Remaining   |"
 "| There are $($NEWLTS2.Count) New Computers Now         |"
+"| $j Computers were renamed during this cycle           |"
 ' ------------------------------------------------------- '
