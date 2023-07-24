@@ -21,6 +21,11 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
    }
 
 
+Param(
+    [string]$SiteURL = '',
+    [string]$UserEmail = ''
+)
+
 #initialize variables
 $backDate = '0'
 $i = 1
