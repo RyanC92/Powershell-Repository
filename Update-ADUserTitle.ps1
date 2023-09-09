@@ -15,10 +15,12 @@ Foreach ($User in $Users){
         Write-Host "Updating $($User.Name) from $($User.Description) to $($User.Title). `n" -ForegroundColor Green
         Set-aduser -identity "$($User.SamAccountName)" -Description $($User.Title) #-whatif
         $countChange++
+
     }else {
 
         Write-Host "$($User.Name)'s description ($($User.Description)) is accurate to their title ($($User.Title)), No changes have been made. `n" -ForegroundColor Yellow
         $countSame++
+    
     }
 }
 

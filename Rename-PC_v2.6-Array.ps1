@@ -8,7 +8,8 @@ $i = 1
 foreach($ip in $iprange){
     '-------------'
     "Processing: $i"
-    $IPaddr = "172.18.47.$ip"
+    $IPAddr = "10.136.138.$ip"
+    #$IPaddr = "172.22.47.$ip"
     $Online = Test-Connection -IPAddress $IPAddr -Quiet -count 1
     "Testing Result: Online is $online"
 
