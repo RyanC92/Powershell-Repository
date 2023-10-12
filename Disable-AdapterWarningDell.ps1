@@ -6,7 +6,7 @@ Function Check-RunAsAdministrator()
   #Check user is running the script is member of Administrator Group
   if($CurrentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator))
   {
-       Write-host "Script is running with Administrator privileges!"
+       Write-host "Script is running with Administrator privileges!" -ForegroundColor DarkGreen
   }
   else
     {
@@ -32,23 +32,38 @@ Function Check-RunAsAdministrator()
 Check-RunAsAdministrator
 
 if(Get-Module -ListAvailable -name DellBIOSProvider){
-    "------------------------------------------------------"
+    "------------------------------------------------------`n"
     Write-host "Module Installed, skipping install sequence" -ForegroundColor Green
-    "------------------------------------------------------"
+    Start-sleep -Seconds 1
+    "------------------------------------------------------`n"
 }else{
-    "------------------------------------------------------"
-    Write-Host "DellBIOSProvider Module not installed, installing now." -ForegroundColor Yellow
+    "------------------------------------------------------`n"
+    Write-Host "DellBIOSProvider Module not installed, installing now.`n" -ForegroundColor Yellow
+    "------------------------------------------------------`n"
     Install-Module -Name DellBIOSProvider -Confirm -Force
-    Write-host ""
-    "------------------------------------------------------"
+    Write-host "DellBiosProvider Module has been installed.`n"
+    "------------------------------------------------------`n"
+    Start-sleep -Seconds 1
 }
 
-Write-Host "Importing Module DellBiosProvider" -ForegroundColor Green
+Write-Host "Importing Module DellBiosProvider `n" -ForegroundColor Green
+"------------------------------------------------------`n"
 Import-Module DellBiosProvider
 
-"------------------------------------------------------"
-Write-host "Disabling Adapter Warning" -ForegroundColor Green
-set-Item DellSMBios:\POSTBehavior\PowerWarn "Disabled"
-Start-sleep -Seconds 2
-Write-host "Adapter Warning Disabled" -ForegroundColor Green
-"------------------------------------------------------"
+$power = Get-item DellSMBios:\POSTBehavior\PowerWarn
+
+if($power.CurrentValue -eq "Disabled"){
+    $power
+    Write-Host "Power Adapter Warning Is Already Disabled.`n"
+    "Nothing has been changed." 
+}else{
+    $power
+    Write-host "Disabling Adapter Warning `n" -ForegroundColor Green
+    set-Item DellSMBios:\POSTBehavior\PowerWarn "Disabled"
+    Get-item DellSMBios:\POSTBehavior\PowerWarn
+    Start-sleep -Seconds 1
+    Write-host "Adapter Warning has been Disabled `n" -ForegroundColor Green
+    "------------------------------------------------------`n"
+}
+
+pause
