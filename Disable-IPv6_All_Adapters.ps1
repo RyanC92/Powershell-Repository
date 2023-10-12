@@ -31,7 +31,6 @@ Function Check-RunAsAdministrator()
 #Check Script is running with Elevated Privileges
 Check-RunAsAdministrator
  
-#Place your script here.
 
 $Adapter = Get-NetAdapterBinding |where-Object ComponentID -EQ 'ms_tcpip6' | Where-Object Name -notlike "*Bluetooth*"
 "Adapters Loaded`n"
