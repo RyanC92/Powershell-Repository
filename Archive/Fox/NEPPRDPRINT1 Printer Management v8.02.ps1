@@ -1,18 +1,9 @@
 #Uncomment this to HIDE the powershell window (you will only see the GUI)
-<#$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
+$t = '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);'
 add-type -name win -member $t -namespace native
 [native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle, 0)
-#>
 
 
-#Installs modules needed for progress bar
-<#$mod = Test-Path C:\Users\Urban\Documents\WindowsPowerShell\Modules\PoshProgressBar\0.132\PoshProgressBar.psm1
-
-if ($mod -eq $false) {
-Install-PackageProvider -Name NuGet -scope CurrentUser -force
-Install-Module -Name PoshProgressBar -Scope CurrentUser -force
-	}
-#>
 
 Try{
     Import-Module -Name PoshProgressBar -Erroraction stop
