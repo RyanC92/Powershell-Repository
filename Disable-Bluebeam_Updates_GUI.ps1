@@ -1,6 +1,10 @@
+Write-Host "---------------------------" -Foregroundcolor Green
+Write-Host "| Created By: Ryan Curran |" -ForegroundColor Green
+Write-Host "---------------------------" -ForegroundColor Green
+
 function UpdateSwitch{
     $Title = "Choose options 1, 2 or 3 to proceed."
-    $Info = Write-host "Would you like to enable or disable Bluebeam updates?" -Foregroundcolor Yellow -Backgroundcolor Black
+    $Info = Write-host "Would you like to enable or disable Bluebeam update prompt (Help -> Check For Updates)?" -Foregroundcolor Yellow -Backgroundcolor Black
     
     $options = [System.Management.Automation.Host.ChoiceDescription[]] @("&1. Enable", "&2. Disable", "&3. Quit")
     [int]$defaultchoice = 1
@@ -36,6 +40,7 @@ function UpdateSwitch{
         }
     }
 }
+
 
 While($val -ne 2){
     UpdateSwitch

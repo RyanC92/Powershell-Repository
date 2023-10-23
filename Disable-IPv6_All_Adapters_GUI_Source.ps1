@@ -1,4 +1,7 @@
 $Adapter = Get-NetAdapterBinding |where-Object ComponentID -EQ 'ms_tcpip6' | Where-Object Name -notlike "*Bluetooth*"
+Write-Host "---------------------------" -Foregroundcolor Green
+Write-Host "| Created By: Ryan Curran |" -ForegroundColor Green
+Write-Host "---------------------------" -ForegroundColor Green
 "Adapters Loaded`n"
 $Val = 1
 function AdapterSwitch{
