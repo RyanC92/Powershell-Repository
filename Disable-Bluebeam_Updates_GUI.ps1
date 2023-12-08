@@ -2,6 +2,9 @@ Write-Host "---------------------------" -Foregroundcolor Green
 Write-Host "| Created By: Ryan Curran |" -ForegroundColor Green
 Write-Host "---------------------------" -ForegroundColor Green
 
+"`n"
+
+"This patch will work for 20.x.x version of Bluebeam only (currently)`n"
 function UpdateSwitch{
     $Title = "Choose options 1, 2 or 3 to proceed."
     $Info = Write-host "Would you like to enable or disable Bluebeam update prompt (Help -> Check For Updates)?" -Foregroundcolor Yellow -Backgroundcolor Black
@@ -12,22 +15,38 @@ function UpdateSwitch{
     switch($opt)
     {
         0 { 
+            cls
 
-            Write-Host "Enabling Bluebeam Updates" -ForegroundColor Green
+            Write-Host "---------------------------" -Foregroundcolor Green
+            Write-Host "| Created By: Ryan Curran |" -ForegroundColor Green
+            Write-Host "---------------------------" -ForegroundColor Green
+
+            "`n"
             
-                Set-ItemProperty -Path "HKLM:\Software\Bluebeam Software\20\Revu" -Name "DisableInAppUpdates" -Value "0"
+            Write-Host "Option Selected: Enabling Bluebeam Updates." -ForegroundColor Green
+            
+            Set-ItemProperty -Path "HKLM:\Software\Bluebeam Software\20\Revu" -Name "DisableInAppUpdates" -Value "0"
                 
-            "`nBluebeam Updates has been Enabled.`n"
+            Write-Host "`nBluebeam Updates has been Enabled.`n" -ForegroundColor Green
+            Write-Host "`nClose and re-open Bluebeam for the changes to take effect.`n" -ForegroundColor Green
+
             $val = 0
 
         }
         1 { 
+            cls
 
-            Write-Host "Disable Bluebeam Updates" -ForegroundColor Green
+            Write-Host "---------------------------" -Foregroundcolor Green
+            Write-Host "| Created By: Ryan Curran |" -ForegroundColor Green
+            Write-Host "---------------------------" -ForegroundColor Green
+
+            "`n"
+            Write-Host "Option Selected: Disable Bluebeam Updates." -ForegroundColor Green
             
             Set-ItemProperty -Path "HKLM:\Software\Bluebeam Software\20\Revu" -Name "DisableInAppUpdates" -Value "1"
                 
-            "`nBluebeam Updates has been Disabled.`n"
+            Write-Host "`nBluebeam Updates has been Disabled.`n" -ForegroundColor Green
+            Write-Host "`nClose and re-open Bluebeam for the changes to take effect.`n" -ForegroundColor Green
 
             $val = 1
 

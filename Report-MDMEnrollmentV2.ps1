@@ -15,7 +15,7 @@ foreach ($user in $users) {
     }
 }
 $results | Where-Object { $_.groups -notmatch 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\NonEnrolledMDMUsers.xlsx" -Autosize -Autofilter -WorksheetName "Not Enrolled"
-
+$results | Where-Object { $_.groups -match 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\NonEnrolledMDMUsers.xlsx" -Autosize -Autofilter -WorksheetName "Enrolled"
 
 
 

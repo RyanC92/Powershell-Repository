@@ -21,4 +21,4 @@ ForEach($OU in $OUs){
 
     Write-host "Moved $($SBusers.count) Users from $OU" -ForegroundColor Green
 
-}pause
+}

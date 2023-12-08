@@ -15,7 +15,7 @@ $OUs = @(
     $Array = @()
 
 Foreach ($OU in $OUs){
-    "Getting Computers for $OU"
+    Write-host "Getting Computers for $OU" -ForegroundColor Green
     $Comps = Get-adcomputer -SearchBase "$OU" -Filter * | select Name, DistinguishedName
     
     Foreach ($Comp in $Comps){
@@ -31,9 +31,12 @@ Foreach ($OU in $OUs){
             'BitlockerKey Created' = $BitlockerKey.whenCreated
             'BitlockerKey' = $($BitlockerKey.'msFVE-RecoveryPassword')
         }
-        $ARRAY
-    }
-}$array | Export-Excel -Path "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\NJO\Reports\PANJ_ADDump-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).xlsx" `
+        
+    } 
+}
+$array
+Write-host "Creating Report - PANJ_ADDump-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).xlsx" -ForegroundColor Green
+$array | Export-Excel -Path "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\NJO\Reports\PANJ_ADDump-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).xlsx" `
     -Password "S8perM!n" -AutoSize -FreezeTopRow -AutoFilter -BoldTopRow
 
 $OldFiles = (Get-Childitem $Path) | Where {$_.CreationTime -le (Get-Date).addDays(-31)}
@@ -43,4 +46,3 @@ Foreach($File in $OldFiles){
     Remove-item "$Path\$($File.Name)"
 
 }
-pause
