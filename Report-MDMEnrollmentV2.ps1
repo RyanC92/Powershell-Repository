@@ -14,8 +14,8 @@ foreach ($user in $users) {
         'BU'= $match.Groups[1].Value
     }
 }
-$results | Where-Object { $_.groups -notmatch 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\NonEnrolledMDMUsers.xlsx" -Autosize -Autofilter -WorksheetName "Not Enrolled"
-$results | Where-Object { $_.groups -match 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\NonEnrolledMDMUsers.xlsx" -Autosize -Autofilter -WorksheetName "Enrolled"
+$results | Where-Object { $_.groups -notmatch 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\TUR.ALL.MDM.Users-Enrollment-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).xlsx" -Autosize -Autofilter -WorksheetName "Not Enrolled"
+$results | Where-Object { $_.groups -match 'TUR.ALL.MDM.USERS' -and $_.Manager -ne $null} | Select-Object user, displayname, UserprincipalName, BU,Office | Export-excel "C:\Users\rcurran\Turner Construction\IS Field Staff - PANJ and NYN\Regional Projects\MDM\TUR.ALL.MDM.Users-Enrollment-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).xlsx" -Autosize -Autofilter -WorksheetName "Enrolled"
 
 
 
