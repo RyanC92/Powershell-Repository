@@ -9,7 +9,6 @@ $button2 = New-Object System.Windows.Forms.Button
 $button3 = New-Object System.Windows.Forms.Button
 $panel = New-Object System.Windows.Forms.Panel
 
-
 # Configure the form
 $form.Text = "Turner Fixes"
 $form.Size = New-Object System.Drawing.Size(355, 150)
@@ -35,7 +34,6 @@ $label.TextAlign = [System.Drawing.ContentAlignment]::BottomCenter
 $label.Dock = [System.Windows.Forms.DockStyle]::Fill
 #$label.Size = New-Object System.Drawing.Size(250,45)
 #$label.Location = New-Object System.Drawing.Point(75,60)
-
 
 # Add the controls to the form
 
