@@ -51,7 +51,7 @@ set-location ad:
 
 #Prompt for options
 Write-Host "Choose the location to go to to pull the report" -ForegroundColor Yellow
-Write-Host "1. SOM" -ForegroundColor Yellow
+Write-Host "1. NJO" -ForegroundColor Yellow
 Write-Host "2. PHI" -ForegroundColor Yellow
 Write-Host "3. PIT" -ForegroundColor Yellow
 Write-Host "4. MAH" -ForegroundColor Yellow
@@ -68,7 +68,7 @@ $i = 0
 #Run your if variables, if for <location> run the report
 if($Location -like "SOM" -or $Location -like "1"){
 
-    Set-location "OU=Computers,OU=Somerset,OU=North East,OU=Offices,DC=tcco,DC=org"
+    Set-location "OU=Computers,OU=New Jersey,OU=North East,OU=Offices,DC=tcco,DC=org"
     $PCS = Get-adcomputer -filter * | Select Name
 
     "$($PCS.name.count) PCs have been found in this OU... Processing."
@@ -90,7 +90,7 @@ if($Location -like "SOM" -or $Location -like "1"){
 
         }else{
             Write-Host "$($PC.Name) is Offline, Skipping - Failed hostnames will be exported. "
-            $PC | Export-csv "$($Directory)\SOM_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append
+            $PC | Export-csv "$($Directory)\SOM_Failed_WMIC_Report_$([DateTime]::Now.ToSTring("MM-dd-yyyy")).csv" -append -NoTypeInformation
         }
 
     }
