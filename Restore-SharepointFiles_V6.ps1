@@ -21,10 +21,10 @@ if (-Not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
    }
 
 
-Param(
-    [string]$SiteURL = '',
-    [string]$UserEmail = ''
-)
+# Param(
+#     [string]$SiteURL = '',
+#     [string]$UserEmail = ''
+# )
 
 #initialize variables
 $backDate = '0'
@@ -43,7 +43,13 @@ if(Get-Module -ListAvailable -name Microsoft.Online.SharePoint.Powershell){
     #Note: You may have to press Enter to continue." -ForegroundColor Green
 
     $pnp = Get-module -ListAvailable -name Pnp.Powershell | Select Version
-    "Your PnP.Powershell Version is: $($pnp.version), if it is sub version 1.9. Please run 'update-module -name pnp.powershell'"
+    $pnpver = "$($pnp.version.major)"+"$($pnp.Version.minor)"+"$($pnp.version.build)"
+    if($pnpver -lt 220){
+        "Your PnP.Powershell Version is: $($pnp.version) which is below the required version. Updating the module now. This may take a few minutes (This requires powershell to be run as an Administrator)"
+        update-module -name pnp.powershell -force
+    }else{
+        "Your PnP.Powershell Version is:$($pnp.version)"
+    }
 
     <#$verCheck = Find-module -name pnp.powershell -Repository PSGallery | select Version
     "The Current Version of PnP.Powershell is: $($verCheck.Version). If they are equal, it will skip"
