@@ -1,5 +1,5 @@
 #Created by Ryan Curran
-# 3/21/24
+# 5/16/24
 #######################
 
 Add-type -AssemblyName PresentationCore, PresentationFramework
@@ -7,10 +7,19 @@ Add-type -AssemblyName PresentationCore, PresentationFramework
 #Variables
 
 $entries = Get-githubcontent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries
-$indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"{0:D2} MB" -f [math]::Round($_.Size / 1MB)}}, download_url
+$indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"$([math]::Round($_.size / 1MB)) MB"}}, download_url
 $indexedEntries | Format-Table -Property "#", name, "File Size", download_url -AutoSize
 
 $Printer entry
+
+
+
+$scriptcontent = @"
+
+#Created by Ryan Curran
+# 5/16/24
+#######################
+
 #---------------------Static Values---------------------------
 #Dont change these values
 $githost = "github.com"
@@ -82,3 +91,6 @@ rundll32 printui.dll,PrintUIEntry /if /n "$PrinterDisplayName" /b "$PrinterDispl
 
 Write-Host "`n[==========================100]`n" -ForegroundColor Green
 [System.windows.messagebox]::show("Printer $PrinterDisplayName is now Installed")
+
+"@
+Set-Content -Path ".\JV Printer Script.ps1" -Value $ScriptContent
