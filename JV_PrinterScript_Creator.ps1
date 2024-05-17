@@ -2,6 +2,42 @@
 # 5/16/24
 #######################
 
+Function Check-RunAsAdministrator()
+{
+  #Get current user context
+  $CurrentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
+  
+  #Check user is running the script is member of Administrator Group
+  if($CurrentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator))
+  {
+       Write-host "Script is running with Administrator privileges!" -ForegroundColor DarkGreen
+  }
+  else
+    {
+       #Create a new Elevated process to Start PowerShell
+       $ElevatedProcess = New-Object System.Diagnostics.ProcessStartInfo "PowerShell";
+ 
+       # Specify the current script path and name as a parameter
+       $ElevatedProcess.Arguments = "& '" + $script:MyInvocation.MyCommand.Path + "'"
+ 
+       #Set the Process to elevated
+       $ElevatedProcess.Verb = "runas"
+ 
+       #Start the new elevated process
+       [System.Diagnostics.Process]::Start($ElevatedProcess)
+ 
+       #Exit from the current, unelevated, process
+       Exit
+ 
+    }
+}
+
+#Check Script is running with Elevated Privileges
+Check-RunAsAdministrator
+
+#Install PowershellForGithub Module to pull in Github directory
+Install-Module -Name PowerShellForGitHub -confirm:$False -force 
+
 Add-type -AssemblyName PresentationCore, PresentationFramework
 
 #Variables
@@ -10,8 +46,12 @@ $entries = Get-githubcontent -OwnerName TurnerJVDriverRepo -RepositoryName TCCOD
 $indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"$([math]::Round($_.size / 1MB)) MB"}}, download_url
 $indexedEntries | Format-Table -Property "#", name, "File Size", download_url -AutoSize
 
-$Printer entry
-
+Write-host "Turner JV Printer Creation Script `n
+Enter the required information below and a printer script for JV Printers will be created in Powershell.`n
+This is for printers that are on the Turner Guest VLAN with a 192 IP or on Owners networks." -ForegroundColor Green -BackgroundColor Black
+$printerIP = Read-Host "Enter The Printer IP"
+$printerDisplayName = Read-Host "Enter the display name of the printer (as it will show in their print queue)"
+$driverName = "Please Enter the driver name (DriverName can be found inside of the "INF" file for the driver)"
 
 
 $scriptcontent = @"
@@ -22,27 +62,12 @@ $scriptcontent = @"
 
 #---------------------Static Values---------------------------
 #Dont change these values
-$githost = "github.com"
-$gitpath = "https://github.com/TurnerJVDriverRepo/TCCODrivers/raw/main/"
 $tcpipPort = "9100"
 $userpath = "$env:userprofile\Downloads\"
 #---------------------End Static Values-----------------------
 
-#Printer IP Address
-$printerIP =  "192.168.252.240"
-#The name the end user will see for their printer entry
-$printerDisplayname = "Princeton - Ricoh C6004"
-#DriverName can be found inside of the "INF" file for the driver
-$driverName = "RICOH MP C6004 PCL 6"
-#Get the name of the ZIP from github (Example: Ricoh_C8003.zip)
-$driverZipName = "Ricoh C6004.zip"
 
-
-#Build the URL
-$driverZipLink = $driverZipName -replace ' ', '%20'
-$driverURL = $gitpath+$driverZipLink
-
-$tc = test-connection $githost -Count 1 -Quiet
+$tc = test-connection  -Count 1 -Quiet
 if ($tc -eq $True){
 
     "Connection Test Success"
