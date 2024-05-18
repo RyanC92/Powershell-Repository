@@ -46,13 +46,17 @@ $entries = Get-githubcontent -OwnerName TurnerJVDriverRepo -RepositoryName TCCOD
 $indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"$([math]::Round($_.size / 1MB)) MB"}}, download_url
 $indexedEntries | Format-Table -Property "#", name, "File Size", download_url -AutoSize
 
-Write-host "Turner JV Printer Creation Script `n
+"------------------------------------------------------`n"
+Write-host "Turner JV Printer Creator `n
 Enter the required information below and a printer script for JV Printers will be created in Powershell.`n
 This is for printers that are on the Turner Guest VLAN with a 192 IP or on Owners networks." -ForegroundColor Green -BackgroundColor Black
+"------------------------------------------------------`n"
 $printerIP = Read-Host "Enter The Printer IP"
+"------------------------------------------------------`n"
 $printerDisplayName = Read-Host "Enter the display name of the printer (as it will show in their print queue)"
-$driverName = "Please Enter the driver name (DriverName can be found inside of the "INF" file for the driver)"
-
+"------------------------------------------------------`n"
+$driverName = Read-Host 'Please Enter the driver name (DriverName can be found inside of the "INF" file for the driver)'
+"------------------------------------------------------`n"
 
 $scriptcontent = @"
 
