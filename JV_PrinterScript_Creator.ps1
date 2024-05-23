@@ -37,17 +37,14 @@ Check-RunAsAdministrator
 
 #Install PowershellForGithub Module to pull in Github directory
 Install-Module -Name PowerShellForGitHub -confirm:$False -force 
-
 Add-type -AssemblyName PresentationCore, PresentationFramework
 
 #Variables
-
 $entries = Get-githubcontent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries
 $indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"$([math]::Round($_.size / 1MB)) MB"}}, download_url
 $indexedEntries | Format-Table -Property "#", name, "File Size", download_url -AutoSize
-
 "------------------------------------------------------`n"
-Write-host "Turner JV Printer Creator `n
+Write-host "Turner JV / Owners Network Printer Creator `n
 Enter the required information below and a printer script for JV Printers will be created in Powershell.`n
 This is for printers that are on the Turner Guest VLAN with a 192 IP or on Owners networks." -ForegroundColor Green -BackgroundColor Black
 "------------------------------------------------------`n"

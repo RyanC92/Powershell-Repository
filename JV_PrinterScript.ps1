@@ -20,9 +20,9 @@ $printerIP =  "192.168.252.240"
 #The name the end user will see for their printer entry
 $printerDisplayname = "Princeton - Ricoh C6004"
 #DriverName can be found inside of the "INF" file for the driver
-$driverName = "RICOH MP C6004 PCL 6"
+$driverName = "RICOH MP C4500 PCL 6"
 #Get the name of the ZIP from github (Example: Ricoh_C8003.zip)
-$driverZipName = "Ricoh C6004.zip"
+$driverZipName = "Ricoh C4500.zip"
 
 
 #Build the URL
