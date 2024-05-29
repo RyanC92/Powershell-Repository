@@ -35,14 +35,29 @@ Function Check-RunAsAdministrator()
 #Check Script is running with Elevated Privileges
 Check-RunAsAdministrator
 
-#Install PowershellForGithub Module to pull in Github directory
-Install-Module -Name PowerShellForGitHub -confirm:$False -force 
+#Define Module Name
+$moduleName = "PowerShellForGithub"
+# Check if the module is installed
+if (!(Get-Module -ListAvailable -Name $moduleName)) {
+    # If the module is not installed, install it
+    Write-Output "$moduleName is not installed. Installing..."
+    try {
+        Install-Module -Name $moduleName -Force -Confirm:$False -Scope CurrentUser
+        Write-Output "$moduleName has been installed successfully."
+    } catch {
+        Write-Output "An error occurred while installing ${moduleName}: $($_.Exception.Message)"
+    }
+} else {
+    Write-Output "$moduleName is already installed."
+}
+
 Add-type -AssemblyName PresentationCore, PresentationFramework
 
 #Variables
 $entries = Get-githubcontent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries
 $indexedEntries = $entries | Select-Object @{Name="#"; Expression={[array]::IndexOf($entries, $_) + 1}}, name, Path, @{Name = "File Size"; Expression={"$([math]::Round($_.size / 1MB)) MB"}}, download_url
 $indexedEntries | Format-Table -Property "#", name, "File Size", download_url -AutoSize
+
 "------------------------------------------------------`n"
 Write-host "Turner JV / Owners Network Printer Creator `n
 Enter the required information below and a printer script for JV Printers will be created in Powershell.`n
