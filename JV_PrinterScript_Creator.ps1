@@ -69,7 +69,7 @@ try {
 }
 
 # Retrieve entries from the GitHub repository
-$entries = Get-GitHubContent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries | Where-object {$_.Name -NE "bin"}
+$entries = Get-GitHubContent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers -Path drivers | Select-Object -ExpandProperty Entries | Where-object {$_.Name -NE "bin"}
 
 # Combine JSON data with entries based on matching "FileName" and "Name"
 $combinedEntries = @()
