@@ -57,7 +57,7 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 # Define the URL for the raw JSON file
-$jsonUrl = "https://github.com/TurnerJVDriverRepo/TCCODrivers/raw/main/Driverlist/DriverList.json"
+$jsonUrl = "https://github.com/TurnerJVDriverRepo/TCCODrivers/raw/main/bin/DriverList.json"
 
 # Use Invoke-RestMethod to download the JSON content and parse it into a PowerShell object
 try {
@@ -68,7 +68,7 @@ try {
 }
 
 # Retrieve entries from the GitHub repository
-$entries = Get-GitHubContent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries
+$entries = Get-GitHubContent -OwnerName TurnerJVDriverRepo -RepositoryName TCCODrivers | Select-Object -ExpandProperty Entries | Where-object {$_.Name -NE "bin"}
 
 # Combine JSON data with entries based on matching "FileName" and "Name"
 $combinedEntries = @()
@@ -156,7 +156,7 @@ $button.Add_Click({
             DownloadURL = $selectedRow.Cells["DownloadURL"].Value
             INFFileName = $selectedRow.Cells["INFFileName"].Value
         }
-        [System.Windows.Forms.MessageBox]::Show("You selected1: " + $($script:selectedEntry.Name))
+        [System.Windows.Forms.MessageBox]::Show("You selected: " + $($script:selectedEntry.Name))
         $form1.Close()
     } else {
         [System.Windows.Forms.MessageBox]::Show("Please select an entry.")
@@ -170,7 +170,7 @@ $form1.Add_Shown({$form1.Activate()})
 # Create the second form
 $form2 = New-Object System.Windows.Forms.Form
 $form2.Text = "Enter Printer Information"
-$form2.Size = New-Object System.Drawing.Size(400, 200)
+$form2.Size = New-Object System.Drawing.Size(400, 250)
 $form2.StartPosition = "CenterScreen"
 
 # Create labels and textboxes for Printer IP and DisplayName
@@ -185,7 +185,7 @@ $textBoxIP.Size = New-Object System.Drawing.Size(200, 20)
 $form2.Controls.Add($textBoxIP)
 
 $labelDisplayName = New-Object System.Windows.Forms.Label
-$labelDisplayName.Text = "Printer DisplayName:"
+$labelDisplayName.Text = "Printer Display Name:"
 $labelDisplayName.Location = New-Object System.Drawing.Point(10, 60)
 $form2.Controls.Add($labelDisplayName)
 
@@ -194,10 +194,27 @@ $textBoxDisplayName.Location = New-Object System.Drawing.Point(150, 60)
 $textBoxDisplayName.Size = New-Object System.Drawing.Size(200, 20)
 $form2.Controls.Add($textBoxDisplayName)
 
+$labelDrivername = New-Object System.Windows.Forms.Label
+$labelDrivername.Text = "Printer Driver Name (Info):"
+$labelDrivername.Location = New-Object System.Drawing.Point(10, 100)
+$form2.Controls.Add($labelDrivername)
+
+#tooltip for Printer DriverName
+$toolTip = New-Object System.Windows.Forms.ToolTip
+$toolTip.IsBalloon = $true  # Optional: Display as a balloon tooltip
+$toolTip.InitialDelay = 500  # Delay before the tooltip is shown (in milliseconds)
+$toolTip.SetToolTip($labelDrivername, "Example: RICOH MP C8003 PCL 6)`n This can be found in the INF file")
+
+
+$textBoxDrivername = New-Object System.Windows.Forms.TextBox
+$textBoxDrivername.Location = New-Object System.Drawing.Point(150, 100)
+$textBoxDrivername.Size = New-Object System.Drawing.Size(200, 20)
+$form2.Controls.Add($textBoxDrivername)
+
 # Create a button to submit the printer information
 $submitButton = New-Object System.Windows.Forms.Button
 $submitButton.Size = New-Object System.Drawing.Size(100, 30)
-$submitButton.Location = New-Object System.Drawing.Point(150, 100)
+$submitButton.Location = New-Object System.Drawing.Point(150, 150)
 $submitButton.Text = "Submit"
 $form2.Controls.Add($submitButton)
 
@@ -205,11 +222,12 @@ $form2.Controls.Add($submitButton)
 $submitButton.Add_Click({
     $script:printerIP = $textBoxIP.Text
     $script:printerDisplayName = $textBoxDisplayName.Text
+    $script:driverName = $textBoxDrivername.Text
 
     if ([string]::IsNullOrWhiteSpace($printerIP) -or [string]::IsNullOrWhiteSpace($printerDisplayName)) {
         [System.Windows.Forms.MessageBox]::Show("Please fill in all fields.")
     } else {
-        [System.Windows.Forms.MessageBox]::Show("Printer IP: " + $script:printerIP + "`nPrinter DisplayName: " + $script:printerDisplayName)
+        [System.Windows.Forms.MessageBox]::Show("Printer IP: " + $script:printerIP + "`nPrinter DisplayName: " + $script:printerDisplayName + "`nPrinter Driver Name: " + $script:driverName)
         $form2.Close()
     }
 })
@@ -224,10 +242,15 @@ if ($selectedEntry -ne $null) {
 } else {
     Write-Output "No entry was selected."
 }
-Write-Output "Printer IP: $printerIP"
-Write-Output "Printer DisplayName: $printerDisplayName"
-Write-Output "Printer Model: $($selectedEntry.PrinterModel)"
-Write-Output "Generating Printer Script in C:\Temp\"
+
+Write-host "Printer IP: $printerIP
+Printer DisplayName: $printerDisplayName
+Printer Model: $($selectedEntry.PrinterModel)
+Printer Driver Name: $driverName
+`nGenerating Printer Script in C:\Temp\
+" -ForegroundColor Green
+
+Pause
 
 $scriptcontent = @"
 
@@ -292,7 +315,7 @@ if ($dirtest -contains "$driverFoldername") {
 }
 
 #find the INF file
-$INFPath = Get-childitem -Path $userpath\$driverFoldername -Filter "$($SelectedEntry.) | select FullName
+$INFPath = Get-childitem -Path $userpath\$driverFoldername -Filter "$($SelectedEntry.Name) | select FullName
 
 # Update progress for creating the printer port
 $percentComplete = 75
@@ -309,7 +332,7 @@ $progressStatus = "Creating Printer Entry $printerDisplayName"
 Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
 
 # Create Printer Entry
-rundll32 printui.dll,PrintUIEntry /if /n "$PrinterDisplayName" /b "$PrinterDisplayName" /f "$($INFPath.FullName)" /r "$printerIP" /m "$driverName" #Find this (DriverName)
+rundll32 printui.dll,PrintUIEntry /if /n "$PrinterDisplayName" /b "$PrinterDisplayName" /f "$($INFPath.FullName)" /r "$printerIP" /m "$driverName"
 
 # Update progress to completion
 $percentComplete = 100
@@ -318,4 +341,22 @@ Write-Progress -Activity $progressActivity -Status $progressStatus -PercentCompl
 [System.Windows.MessageBox]::Show("Printer $PrinterDisplayName is now Installed")
 
 "@
-# Set-Content -Path ".\Right Click - Run with PowerShell.ps1" -Value $scriptcontent
+
+"Testing Dir Path for C:\Temp\Driver\"
+$dirtest = test-path "C:\Temp\Driver"
+
+if($dirtest -eq $False){
+    "`n Dir path not found, creating C:\Temp\Driver"
+    New-Item -Path "C:\Temp\Driver" -ItemType Directory
+
+}else{
+    "`n Dir path found, skipping creation"
+}
+
+New-Item -Path "C:\Temp\Driver\" -Name "Right Click - Run with PowerShell.ps1" -ItemType File
+
+Set-Content -Path "C:\Temp\Driver\Right Click - Run with PowerShell.ps1" -Value $scriptcontent
+
+Compress-Archive "C:\Temp\Driver\Right Click - Run With Powershell.ps1" -DestinationPath "C:\Temp\Driver\$PrinterDisplayName" -Force
+
+pause
