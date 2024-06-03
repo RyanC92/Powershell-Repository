@@ -1,6 +1,7 @@
-#Created by Ryan Curran
-# 5/16/24
-#######################
+########################
+#Created by Ryan Curran#
+# 6/3/24               #
+########################
 
 Function Check-RunAsAdministrator()
 {
@@ -256,7 +257,7 @@ $scriptcontent = @"
 
 ##########################
 # Created by Ryan Curran #
-# Revision Date 5/30/24  #
+# Revision Date 6/3/24  #
 ##########################
 
 Add-Type -assembly "system.io.compression.filesystem"
@@ -354,9 +355,12 @@ if($dirtest -eq $False){
 }
 
 New-Item -Path "C:\Temp\Driver\" -Name "Right Click - Run with PowerShell.ps1" -ItemType File
-
 Set-Content -Path "C:\Temp\Driver\Right Click - Run with PowerShell.ps1" -Value $scriptcontent
-
 Compress-Archive "C:\Temp\Driver\Right Click - Run With Powershell.ps1" -DestinationPath "C:\Temp\Driver\$PrinterDisplayName" -Force
+Get-Childitem -Path C:\Temp\Driver -Filter "*.ps1" | %{Remove-Item -Path $_.FullName}
+
+[System.Windows.Forms.MessageBox]::Show("Zip file has been created")
+
+ii "C:\Temp\Drivers\"
 
 pause
