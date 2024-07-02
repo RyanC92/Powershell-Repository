@@ -82,6 +82,7 @@ foreach ($entry in $entries) {
             FileSize       = "$([math]::Round($entry.size / 1MB)) MB"
             DownloadURL    = $entry.download_url
             INFFileName    = $match.INFFileName  # Assuming INFFileName is a property in the JSON
+            DriverName     = $match.PrinterDriverName 
         }
         $combinedEntries += $combinedEntry
     }
@@ -164,9 +165,17 @@ $button.Add_Click({
     }
 })
 
-# Show the first form
-$form1.Add_Shown({$form1.Activate()})
-[void]$form1.ShowDialog()
+cls
+
+Write-Output "Select a Printer model from the printer driver list window"
+
+Try{
+    # Show the first form
+    $form1.Add_Shown({$form1.Activate()})
+    [void]$form1.ShowDialog()
+}catch [System.SystemException]{
+    Write-Warning "Printer List Failed to launch"
+}
 
 # Create the second form
 $form2 = New-Object System.Windows.Forms.Form
@@ -233,9 +242,14 @@ $submitButton.Add_Click({
     }
 })
 
-# Show the second form
-$form2.Add_Shown({$form2.Activate()})
-[void]$form2.ShowDialog()
+Try{
+    # Show the second form
+    $form2.Add_Shown({$form2.Activate()})
+    [void]$form2.ShowDialog()
+}catch [System.SystemException]{
+    Write-Warning "Printer Settings GUI Failed to launch"
+}
+
 
 # Optional: Use the selected entry and printer information in further processing
 if ($selectedEntry -ne $null) {
@@ -261,85 +275,110 @@ $scriptcontent = @"
 ##########################
 
 Add-Type -assembly "system.io.compression.filesystem"
+Add-Type -AssemblyName PresentationCore,PresentationFramework
 
 #---------------------Static Values---------------------------
 #Dont change these values
-$tcpipPort = "9100"
-$userpath = "$env:userprofile\Downloads\"
+`$tcpipPort = "9100"
+`$userpath = "`$env:userprofile\Downloads\"
 #---------------------End Static Values-----------------------
 
-$tc = Test-Connection -Count 1 -Quiet
-if ($tc -eq $True) {
+`$tc = Test-Connection github.com -Count 1 -Quiet
+if (`$tc -eq `$True) {
     Write-Output "Connection Test Success"
+    Write-Output "Testing URL: Github.com`n"
 } else {
-    [System.Windows.MessageBox]::Show("Connection test failed, please make sure you are connected to the internet")
+    [System.Windows.MessageBox]::Show("Connection test failed, please make sure you are connected to the internet. `nTesting URL: Github.com")
     exit
 }
 
 #Window Title
-$host.UI.RawUI.WindowTitle = "Installing Printer $PrinterDisplayName"
+`$host.UI.RawUI.WindowTitle = "Installing Printer $PrinterDisplayName"
 
 Write-Output "Installing $printerDisplayName Printer, Please Wait..."
 
 # Initialize progress
-$progressActivity = "Installing Printer"
-$progressStatus = "Initializing"
-$percentComplete = 0
+`$progressActivity = "Installing Printer"
+`$progressStatus = "Initializing"
+`$percentComplete = 0
 
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
+Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete
 
 # Update progress for downloading the driver
-$percentComplete = 25
-$progressStatus = "Downloading the printer driver from the external repo (GitHub)"
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
+`$percentComplete = 25
+`$progressStatus = "Downloading the printer driver from the external repo (GitHub)"
+Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete
+Write-Output "`$ProgressStatus"
 
-# Download driver from GitHub
-Invoke-WebRequest -Uri $($selectedEntry.DownloadURL) -Outfile $env:userprofile\Downloads\$($selectedEntry.Name)
+Try{
+    # Download driver from GitHub
+    Invoke-WebRequest -Uri $($selectedEntry.DownloadURL) -Outfile "`$env:userprofile\Downloads\$($selectedEntry.Name)"
 
-#Get contents of the zip file for the folder name
-$driverFoldername[IO.Compression.ZipFile]::OpenRead("$userpath\$($selectedEntry.name)).Entries.Fullname
+    #Get contents of the zip file for the folder name
+    Write-Output "Opening Zip to read folder name"
+    `$zipFile = [IO.Compression.ZipFile]::OpenRead("`${userpath}$($selectedEntry.name)")
+    `$normalizePath = @()
+    `$normalizePath = `$zipFile.Entries.Fullname -Replace '\\', '/'
+    `$driverFolderName = Foreach-object {`$normalizePath -split '/' | Select-Object -First 1} | select-object -Unique
+    `$zipFile.Dispose()
 
-# Update progress for extracting the driver
-$percentComplete = 65
-$progressStatus = "Extracting the Printer Driver"
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete 
+    Write-Output "Closing Zip"
 
-$dirtest = Get-ChildItem $userpath | Select-Object -ExpandProperty Name
-if ($dirtest -contains "$driverFoldername") {
-    Write-Output "File $driverFoldername detected in $userpath, overwriting the driver folder"
-    Remove-Item -Path "$userpath\$driverFoldername" -Recurse -Force
-    Write-Output "Expanding $($selectedEntry.Name) archive"
-    Expand-Archive -Path "$userpath\$($selectedEntry.Name)" -DestinationPath "$userpath\" -Force
-} else {
-    Write-Output "No Driver folder detected in $userpath, expanding driver archive"
-    Expand-Archive -Path "$userpath\$($selectedEntry.Name)" -DestinationPath "$userpath\" -Force
+    `$driverFolderName
+
+    # Update progress for extracting the driver
+    `$percentComplete = 65
+    `$progressStatus = "Extracting the Printer Driver"
+    Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete 
+    Write-Output "`$ProgressStatus"
+
+    `$dirtest = Get-ChildItem `$userpath | Select-Object -ExpandProperty Name
+    if (`$dirtest -contains "`$driverFoldername") {
+        Write-Output "File `$driverFoldername detected in `$userpath, overwriting the driver folder"
+        Remove-Item -Path "`$userpath\`$driverFoldername" -Recurse -Force
+        Write-Output "Expanding $($selectedEntry.Name) archive"
+        Expand-Archive -Path "`$userpath\$($selectedEntry.Name)" -DestinationPath "`$userpath\" -Force
+    } else {
+        Write-Output "No Driver folder detected in `$userpath, expanding driver archive"
+        Expand-Archive -Path "`$userpath\$($selectedEntry.Name)" -DestinationPath "`$userpath\" -Force
+    }
+
+    #find the INF file
+    Write-output "Searching for $($SelectedEntry.INFFileName) in `$userpath`$driverFoldername"
+    `$INFPath = Get-childitem -Path "`$userpath\`$driverFoldername" -Recurse -Filter "$($SelectedEntry.INFFileName)" | select FullName
+
+    `$INFPath.FullName
+
+    # Update progress for creating the printer port
+    `$percentComplete = 75
+    `$progressStatus = "Creating the Printer port"
+    Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete
+    Write-Output "`$progressStatus"
+
+    # Create Printer TCPIP Port
+    CSCRIPT /nologo `$env:windir\System32\Printing_Admin_Scripts\en-US\prnport.vbs -a -r "$printerIP" -o raw -n 9100 -h "$printerIP"
+    Write-Output "Printer port created with IP $printerIP"
+
+    # Update progress for creating the printer entry
+    `$percentComplete = 90
+    `$progressStatus = "Creating Printer Entry $printerDisplayName"
+    Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete
+    Write-Output "`$progressStatus"
+
+    # Create Printer Entry
+    rundll32 printui.dll,PrintUIEntry /dl /q /n "$printerDisplayName"
+    rundll32 printui.dll,PrintUIEntry /if /n "$PrinterDisplayName" /b "$PrinterDisplayName" /f "`$(`$INFPath.FullName)" /r $printerIP /m "$driverName"
+
+    # Update progress to completion
+    `$percentComplete = 100
+    `$progressStatus = "Installation Complete"
+    Write-Progress -Activity `$progressActivity -Status `$progressStatus -PercentComplete `$percentComplete
+    Write-Output "`$progressStatus"
+    [System.Windows.MessageBox]::Show("Printer $PrinterDisplayName is now Installed")
+
+}catch [System.SystemException]{
+    Write-Warning "Something Failed, please screenshot the error and email rcurran@tcco.com"
 }
-
-#find the INF file
-$INFPath = Get-childitem -Path $userpath\$driverFoldername -Filter "$($SelectedEntry.Name) | select FullName
-
-# Update progress for creating the printer port
-$percentComplete = 75
-$progressStatus = "Creating the Printer port"
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
-
-# Create Printer TCPIP Port
-CSCRIPT /nologo $env:windir\System32\Printing_Admin_Scripts\en-US\prnport.vbs -a -r "$printerIP" -o raw -n 9100 -h "$printerIP"
-Write-Output "Printer port created with IP $printerIP"
-
-# Update progress for creating the printer entry
-$percentComplete = 90
-$progressStatus = "Creating Printer Entry $printerDisplayName"
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
-
-# Create Printer Entry
-rundll32 printui.dll,PrintUIEntry /if /n "$PrinterDisplayName" /b "$PrinterDisplayName" /f "$($INFPath.FullName)" /r "$printerIP" /m "$driverName"
-
-# Update progress to completion
-$percentComplete = 100
-$progressStatus = "Installation Complete"
-Write-Progress -Activity $progressActivity -Status $progressStatus -PercentComplete $percentComplete
-[System.Windows.MessageBox]::Show("Printer $PrinterDisplayName is now Installed")
 
 "@
 
@@ -354,13 +393,22 @@ if($dirtest -eq $False){
     "`n Dir path found, skipping creation"
 }
 
+$filetest = test-path "C:\Temp\Driver\Right Click - Run With Powershell.ps1"
+$ziptest = test-path "C:\Temp\Driver\$PrinterDisplayName.zip"
+
+if($filetest -eq $True){
+    "C:\Temp\Driver\Right Click - Run With Powershell.ps1 found, deleting."
+    Remove-Item -Path "C:\Temp\Driver\Right Click - Run With Powershell.ps1"
+
+}else{
+
+}
+
 New-Item -Path "C:\Temp\Driver\" -Name "Right Click - Run with PowerShell.ps1" -ItemType File
 Set-Content -Path "C:\Temp\Driver\Right Click - Run with PowerShell.ps1" -Value $scriptcontent
 Compress-Archive "C:\Temp\Driver\Right Click - Run With Powershell.ps1" -DestinationPath "C:\Temp\Driver\$PrinterDisplayName" -Force
-Get-Childitem -Path C:\Temp\Driver -Filter "*.ps1" | %{Remove-Item -Path $_.FullName}
+Get-Childitem -Path C:\Temp\Driver -Filter "*.ps1" | Foreach-Object {Remove-Item -Path $_.FullName -Recurse}
 
 [System.Windows.Forms.MessageBox]::Show("Zip file has been created")
 
-ii "C:\Temp\Drivers\"
-
-pause
+ii "C:\Temp\Driver\"
