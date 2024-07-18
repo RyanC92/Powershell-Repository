@@ -1,9 +1,9 @@
 #Get all users by OU and split each OU into its own CSV up to a limit of 500 users per CSV
 #By Ryan Curran
-#4/16/24
+#7/18/24
 ###########################################################################################
 
-# Connect to Active Directory
+# Load the Active Directory module
 Import-Module ActiveDirectory
 
 # Define an array to store the list of "user" OUs
@@ -14,7 +14,7 @@ $OUs = Get-ADOrganizationalUnit -Filter * | select DistinguishedName
 
 # Iterate through each OU and check if it's a "user" OU
 foreach ($OU in $OUs) {
-    if ($OU.DistinguishedName -like "*OU=Users*") {  # You can adjust this condition based on your OU naming convention
+    if ($OU.DistinguishedName -like "*OU=Users*") {  # Adjust this condition based on your OU naming convention
         $userOUs += $OU
     }
 }
@@ -28,13 +28,14 @@ $maxUsersPerFile = 500
 # Initialize a counter for file numbering
 $fileNumber = 1
 
-$dirtest = test-path "C:\Temp\UsersByOU"
-
-if($dirtest -eq $False){
-    "`n Dir path not found, creating C:\Temp\UsersByOU"
-    New-Item -Path "C:\Temp\UsersByOU" -ItemType Directory
-}else{
-    Remove-Item -Path "C:\Temp\UsersByOU\" -Recurse
+# Check if the directory exists, if not, create it; if it does, remove and recreate it
+$dirPath = "C:\Temp\UsersByOU"
+if (-Not (Test-Path $dirPath)) {
+    Write-Host "`n Directory path not found, creating $dirPath"
+    New-Item -Path $dirPath -ItemType Directory
+} else {
+    Remove-Item -Path "$dirPath\" -Recurse
+    New-Item -Path $dirPath -ItemType Directory
 }
 
 Foreach ($UserOU in $UserOUs){
