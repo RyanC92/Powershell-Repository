@@ -28,6 +28,15 @@ $maxUsersPerFile = 500
 # Initialize a counter for file numbering
 $fileNumber = 1
 
+$dirtest = test-path "C:\Temp\UsersByOU"
+
+if($dirtest -eq $False){
+    "`n Dir path not found, creating C:\Temp\UsersByOU"
+    New-Item -Path "C:\Temp\UsersByOU" -ItemType Directory
+}else{
+    Remove-Item -Path "C:\Temp\UsersByOU\" -Recurse
+}
+
 Foreach ($UserOU in $UserOUs){
     # Get users from the specified OU
     Write-Host "Collecting names from $UserOU`n"
@@ -57,7 +66,7 @@ Foreach ($UserOU in $UserOUs){
 
         # Export users to CSV
         Write-Host "Creating ${desiredPart}_${filenumber}.csv`n"
-        $csvFileName = "C:\Temp\${desiredPart}_${filenumber}.csv"
+        $csvFileName = "C:\Temp\UsersByOU\${desiredPart}_${filenumber}.csv"
         $usersSubset | Export-Csv -Path $csvFileName -NoTypeInformation
 
         # Increment the file number for the next iteration
@@ -65,3 +74,5 @@ Foreach ($UserOU in $UserOUs){
         $fileNumber = "{0:D2}" -f $fileNumber
     }
 }
+
+Compress-Archive "C:\Temp\UsersByOU\" -DestinationPath "C:\Temp\UsersByOU-$([DateTime]::Now.ToSTring("MM-dd-yyyy")).zip" -Force
