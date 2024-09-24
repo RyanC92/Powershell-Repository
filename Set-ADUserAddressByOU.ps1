@@ -1,5 +1,5 @@
-#This script would grab each user from an OU Searchbase and check the Title against the description, if the Title is different (which is correct)
-#It will take the Title and replace the description, this is for BU's that use the Description field as a replacement for Title.
+#This Script will update the address based on the user captured data for the OU that is selected.
+
 Import-module activedirectory
 Write-Host "This script will set the address for all users within the OU you select, please answer the questions below exactly as that will be how it is entered into Active Directory`n"
 $OU = Read-Host "Please enter the OU that you want to work on" 
@@ -15,10 +15,9 @@ City: $City
 State: $State
 Office Name: $BUName" -ForegroundColor yellow -BackgroundColor Darkgreen
 
-$Users = Get-aduser -filter * -Searchbase "$OU" -properties City, l, Office, physicalDeliveryOfficeName, StreetAddress, st, state 
+$Users = Get-aduser -filter * -Searchbase "$OU" -properties City, l, Office, PhysicalDeliveryOfficeName, StreetAddress, st, state 
 
 $countChange = 0
-$countSame = 0
 
 Foreach ($User in $Users){
 
@@ -29,7 +28,9 @@ Foreach ($User in $Users){
     $City, $State
     ========================================"
 
-    Set-aduser -Identity "$($User.SamAccountName)" -City $City -l $City -Office $BUName -replace @{phyiscalDeliveryOfficeName = $BUName} -StreetAddress "$Address, $Suite" -state $state
+
+    Set-ADUser -Identity "$($User.SamAccountName)" -City $City -Office $BUName -StreetAddress "$Address, $Suite" -State $State -l $null
+
     $countChange++
 
 }
