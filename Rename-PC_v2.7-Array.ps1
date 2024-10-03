@@ -28,7 +28,7 @@ foreach($ip in $iprange){
                     
                     "Finding Next Available Hostname"
                     
-                    $NJOLTS = get-adcomputer -filter {Name -like "NJOLAP*" -or Name -like "PHILAP0208"} | Select-Object Name
+                    $NJOLTS = get-adcomputer -filter {Name -like "NJOLAP*"} | Select-Object Name
                     #Not working properly, needs to properly pull the NEXT number that is available.
                     <#$searcher = [ADSISearcher]'(&(objectCategory=computer)(name=NJOLAP*))'
                     $searcher.PageSize = 1000
