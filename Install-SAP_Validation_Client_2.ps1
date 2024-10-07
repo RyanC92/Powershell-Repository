@@ -35,6 +35,8 @@ function Check-InitialIsProgramInstalled {
             Write-Output "$($program.Name) is not installed. Will attempt to install. <Check-InitialisProgramInstalled>"
         }
     }
+    Write-output "Checked all Programs, Moving on."
+    $ProgramList.value
 }
 function Is-ProgramInstalled {
     param (
@@ -138,14 +140,14 @@ function Install-DotNet48 {
                     Write-Output "$ProgramName installation status updated in the list."
                 }
             }
-            return 0
+
         } else {
             Write-Output "Failed to install .NET Framework 4.8. Exit Code: $($process.ExitCode) <Install-DotNet48>"
             return 1
         }
     } else {
         Write-Output "Skipping .NET Framework 4.8 installation as it is already installed. <Install-DotNet48>"
-        return 0
+
     }
 }
 
@@ -159,7 +161,11 @@ $ProgramList = @(
         Installed = $False;
     },
     @{
-        Name = 'Microsoft Visual C++ 2015-2019 Redistributable';
+        Name = 'Microsoft Visual C++ 2015-2022 Redistributable';
+        Installed = $False;
+    },
+    @{
+        Name = 'Microsoft Visual C++ 2015-2022 Redistributable';
         Installed = $False;
     },
     @{
@@ -182,7 +188,7 @@ $ProgramList = @(
 
 # Check if the programs are already installed
 Check-InitialIsProgramInstalled -ProgramList ([ref]$ProgramList)
-
+"Check Initial Program Installed is done Moving on To Microsoft VC"
 # List of programs with installation paths
 $MicrosoftVC = @(
     @{
@@ -190,7 +196,7 @@ $MicrosoftVC = @(
         Path = '.\1-VC++2013\12.0.40664.0\VC2013-Install.cmd';
     },
     @{
-        Name = 'Microsoft Visual C++ 2015-2019 Redistributable';
+        Name = 'Microsoft Visual C++ 2015-2022 Redistributable';
         Path = '.\2-VC++2015\14.38.33135.0\InstallVC.cmd';
     }
 )
@@ -231,12 +237,14 @@ foreach ($VC in $MicrosoftVC) {
         $result = Install-Program -ProgramName $VC.Name -InstallerPath $VC.Path -ProgramList ([ref]$ProgramList)
         if (-not $result) {
             Write-Output "Stopping further installations due to failure in installing $($VC.Name)."
-            return 1
+
         }
     }else{
-        Write-output "$($VC.Name) is installed, skipping install. <VC in MicrosoftVC>"
+        Write-output "$($VC.Name) is installed, skipping install."
+
     }
 }
+
 
 # Install .NET Framework 4.8 if needed
 $dotNetResult = Install-DotNet48 -InstallerPath $dotNetInstaller.Path 
@@ -246,13 +254,11 @@ if (-not $dotNetResult) {
 }
 else{
     Write-Output "$($dotNetInstaller.name) Installed correctly, returning code 0. <dotNetResult>"
-    return 0
+
 }
 
-# SAP program installations can be added similarly here
-
 # Uninstall Validation Client
-$ValCLientResult = Install-Program -ProgramName $UninstallValClient.Name -InstallerPath $UninstallValClient.Path -ProgramList ([ref]$ProgramList)
+$ValClientResult = Install-Program -ProgramName $UninstallValClient.Name -InstallerPath $UninstallValClient.Path -ProgramList ([ref]$ProgramList)
 
     if(-not $result){
         Write-Output "Stopping further installations due to failure in uninstalling $($UninstallValClient.Name)"
@@ -260,7 +266,7 @@ $ValCLientResult = Install-Program -ProgramName $UninstallValClient.Name -Instal
     }
     else{
         Write-Output "$($UninstallValClient.Name) Installed Correctly, returning code 0."
-        return 0
+
     }
 
 # Install SAP .Net Connector
@@ -272,7 +278,6 @@ $sapnetconnectorResult = Install-Program -ProgramName $sapnetConnector.Name -Ins
     }
     else{
         Write-Output "$($sapnetConnector.Name) Installed Correctly, returning code 0."
-        return 0
     }
 
 # Install SAP Validation Client
@@ -284,7 +289,6 @@ $sapValidationClientResult = Install-Program -ProgramName $sapValidationClient.N
     }
     else{
         Write-Output "$($sapValidationClient.Name) Installed Correctly, returning code 0."
-        return 0
     }
 
 # Install SAP SCE 7.5
@@ -296,7 +300,6 @@ $sapsceResult = Install-Program -ProgramName $sapSCE.Name -InstallerPath $sapSCE
     }
     else{
         Write-Output "$($sapSCE.Name) Installed Correctly, returning code 0."
-        return 0
     }
 
 $Success = $True
@@ -315,6 +318,7 @@ if (-not $Success) {
     return 1
 } else {
     Write-Output "All programs are installed. Check succeeded."
+    return 0
 }
 
 # Stop logging the transcript
