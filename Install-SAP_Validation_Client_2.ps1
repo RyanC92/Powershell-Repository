@@ -22,7 +22,7 @@ function Check-InitialIsProgramInstalled {
                 $displayName = (Get-ItemProperty -Path $key.PSPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
 
                 if ($displayName -like "*$($program.Name)*") {
-                    Write-Output "$($program.Name) is installed. Updating array value to skip install."
+                    Write-Output "$($program.Name) is installed. Updating array value to skip install. <Check-InitialisProgramInstalled>"
                     $program.Installed = $True
                     $found = $True
                     break
@@ -32,7 +32,7 @@ function Check-InitialIsProgramInstalled {
         }
         
         if (-not $found) {
-            Write-Output "$($program.Name) is not installed. Will attempt to install."
+            Write-Output "$($program.Name) is not installed. Will attempt to install. <Check-InitialisProgramInstalled>"
         }
     }
 }
@@ -52,10 +52,10 @@ function Is-ProgramInstalled {
         foreach ($key in $keys) {
             $displayName = (Get-ItemProperty -Path $key.PSPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
             if ($displayName -like "*$ProgramName*") {
-                Write-Output "$ProgramName is already installed."
+                Write-Output "$ProgramName is already installed. <Is-ProgramInstalled>"
                 return 0
             }else {
-                Write-Output "$ProgramName is not installed, attempting to install now."
+                Write-Output "$ProgramName is not installed, attempting to install now. <Is-ProgramInstalled>"
                 
             }
         }
@@ -69,7 +69,7 @@ function Is-DotNet48Installed {
     $regKey = 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full'
     $release = (Get-ItemProperty -Path $regKey).Release
     if ($release -ge 533320) {
-        Write-Output ".NET Framework 4.8 is already installed."
+        Write-Output ".NET Framework 4.8 is already installed. <Is-DotNet48Installed>"
         return 0
     }
     return 1
@@ -89,22 +89,22 @@ function Install-Program {
 
         # Check if installation was successful
         if ($process.ExitCode -eq 0) {
-            Write-Output "$ProgramName installed successfully."
+            Write-Output "$ProgramName installed successfully. <Install-Program>"
 
             # Update the "Installed" flag in the $ProgramList array
             foreach ($program in $ProgramList.Value) {
                 if ($program.Name -eq $ProgramName) {
                     $program.Installed = $True
-                    Write-Output "$ProgramName installation status updated in the list."
+                    Write-Output "$ProgramName installation status updated in the list. <Install-Program>"
                 }
             }
             return $true
         } else {
-            Write-Output "Failed to install $ProgramName. Exit Code: $($process.ExitCode)"
+            Write-Output "Failed to install $ProgramName. Exit Code: $($process.ExitCode) <Install-Program>"
             return $false
         }
     } else {
-        Write-Output "Skipping $ProgramName installation as it is already installed."
+        Write-Output "Skipping $ProgramName installation as it is already installed. <Install-Program>"
         return $true
     }
 }
@@ -114,7 +114,7 @@ function Is-DotNet48Installed {
     $regKey = 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full'
     $release = (Get-ItemProperty -Path $regKey -ErrorAction SilentlyContinue).Release
     if ($release -ge 533320) {
-        Write-Output ".NET Framework 4.8 is already installed."
+        Write-Output ".NET Framework 4.8 is already installed. <Is-DotNet48Installed>"
         return $true
     }
     return $false
@@ -130,7 +130,7 @@ function Install-DotNet48 {
         Write-Output "Installing .NET Framework 4.8..."
         $process = Start-Process -FilePath $InstallerPath -Wait -PassThru
         if ($process.ExitCode -eq 0) {
-            Write-Output ".NET Framework 4.8 installed successfully."
+            Write-Output ".NET Framework 4.8 installed successfully. <Install-DotNet48>"
                         # Update the "Installed" flag in the $ProgramList array
             foreach ($program in $ProgramList.Value) {
                 if ($program.Name -eq $ProgramName) {
@@ -140,11 +140,11 @@ function Install-DotNet48 {
             }
             return 0
         } else {
-            Write-Output "Failed to install .NET Framework 4.8. Exit Code: $($process.ExitCode)"
+            Write-Output "Failed to install .NET Framework 4.8. Exit Code: $($process.ExitCode) <Install-DotNet48>"
             return 1
         }
     } else {
-        Write-Output "Skipping .NET Framework 4.8 installation as it is already installed."
+        Write-Output "Skipping .NET Framework 4.8 installation as it is already installed. <Install-DotNet48>"
         return 0
     }
 }
@@ -167,15 +167,15 @@ $ProgramList = @(
         Installed = $False;
     },
     @{
-        Name = 'SAP .Net Connector';
+        Name = 'SAP .Net Connector 3.0 for .NET 4.0 on x86';
         Installed = $False;
     },
     @{
-        Name = 'SAP SCE 7.5';
+        Name = 'Validation for SAP Solutions CE 23.2';
         Installed = $False;
     },
     @{
-        Name = 'SAP Validation Client';
+        Name = 'SCE for SAP Solutions 22.2 Patch 37';
         Installed = $False;
     }
 )
@@ -234,7 +234,7 @@ foreach ($VC in $MicrosoftVC) {
             return 1
         }
     }else{
-        Write-output "$($VC.Name) is installed, skipping install."
+        Write-output "$($VC.Name) is installed, skipping install. <VC in MicrosoftVC>"
     }
 }
 
@@ -242,10 +242,10 @@ foreach ($VC in $MicrosoftVC) {
 $dotNetResult = Install-DotNet48 -InstallerPath $dotNetInstaller.Path 
 if (-not $dotNetResult) {
     Write-Output "Stopping further installations due to failure in installing .NET Framework 4.8."
-    exit 1
+    return 1
 }
 else{
-    Write-Output "$($dotNetInstaller.name) Installed correctly, returning code 0."
+    Write-Output "$($dotNetInstaller.name) Installed correctly, returning code 0. <dotNetResult>"
     return 0
 }
 
@@ -256,7 +256,7 @@ $ValCLientResult = Install-Program -ProgramName $UninstallValClient.Name -Instal
 
     if(-not $result){
         Write-Output "Stopping further installations due to failure in uninstalling $($UninstallValClient.Name)"
-        exit 1
+        return 1
     }
     else{
         Write-Output "$($UninstallValClient.Name) Installed Correctly, returning code 0."
@@ -268,7 +268,7 @@ $sapnetconnectorResult = Install-Program -ProgramName $sapnetConnector.Name -Ins
 
     if(-not $result){
         Write-Output "Stopping further installations due to failure in uninstalling $($sapnetConnector.Name)"
-        exit 1
+        return 1
     }
     else{
         Write-Output "$($sapnetConnector.Name) Installed Correctly, returning code 0."
@@ -280,7 +280,7 @@ $sapValidationClientResult = Install-Program -ProgramName $sapValidationClient.N
 
     if(-not $result){
         Write-Output "Stopping further installations due to failure in uninstalling $($sapValidationClient.Name)"
-        exit 1
+        return 1
     }
     else{
         Write-Output "$($sapValidationClient.Name) Installed Correctly, returning code 0."
@@ -292,7 +292,7 @@ $sapsceResult = Install-Program -ProgramName $sapSCE.Name -InstallerPath $sapSCE
 
     if(-not $result){
         Write-Output "Stopping further installations due to failure in uninstalling $($sapSCE.Name)"
-        exit 1
+        return 1
     }
     else{
         Write-Output "$($sapSCE.Name) Installed Correctly, returning code 0."
@@ -312,7 +312,7 @@ foreach ($Program in $ProgramList) {
 if (-not $Success) {
     Write-Output "The following programs are not installed:"
     $NotInstalled | ForEach-Object { Write-Output $_ }
-    exit 1
+    return 1
 } else {
     Write-Output "All programs are installed. Check succeeded."
 }
