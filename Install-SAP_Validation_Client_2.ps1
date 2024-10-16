@@ -145,11 +145,11 @@ function Install-DotNet48 {
             return $true
         } else {
             Write-Output "Failed to install .NET Framework 4.8. Exit Code: $($process.ExitCode) <Install-DotNet48>`n"
-            return $false
+            return 1
         }
     } else {
         Write-Output "Skipping .NET Framework 4.8 installation as it is already installed. <Install-DotNet48>`n"
-        return $true
+
     }
 }
 

@@ -71,6 +71,5 @@ ForEach($PC in $PCs){
       $PC | Select @{Name = "Hostname"; Expression = {$($PC.Hostname)}} | Export-csv C:\CSV\FailedHostnames.csv -Append -Notypeinformation
 
     }
-   
 }
 
