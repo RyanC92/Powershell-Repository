@@ -17,7 +17,7 @@ foreach($LT in $SOMLTS){
         Write-host "Querying: $($LT.Name)" -ForegroundColor Green
 
         try{            
-            $HN = Get-wmiobject -ComputerName $LT.Name -Class Win32_ComputerSystem -Erroraction stop | Select-Object -ExpandProperty Name
+            $HN = Get-wmiobject -ComputerName $LT.Name -Class Win32_ComputerSystem -Erroraction stop -Credential $cred | Select-Object -ExpandProperty Name
 
             Write-host "Response Received `nName is: $HN" -ForegroundColor DarkGreen
             "Gathered Remote Hostname"
