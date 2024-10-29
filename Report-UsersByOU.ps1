@@ -10,7 +10,7 @@ Import-Module ActiveDirectory
 $userOUs = @()
 
 # Retrieve all OUs in Active Directory
-$OUs = Get-ADOrganizationalUnit -Filter * | select DistinguishedName
+$OUs = Get-ADOrganizationalUnit -SearchBase "OU=Users,OU=Mumbai,OU=International,OU=Offices,DC=tcco,DC=org" -Filter * | select DistinguishedName
 
 # Iterate through each OU and check if it's a "user" OU
 foreach ($OU in $OUs) {
