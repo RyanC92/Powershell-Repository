@@ -1,46 +1,52 @@
 # Function to check if the script is running as Administrator
 Measure-Command {
-function Test-Admin {
-    return ([bool]([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
-}
-
-# Function to restart the script with elevated privileges if not running as Admin
-function Elevate-Script {
-    if (-not (Test-Admin)) {
-        $arguments = "& '" + $myinvocation.mycommand.definition + "'"
-        Start-Process powershell -ArgumentList $arguments -Verb RunAs
-        exit
+    function Test-Admin {
+        return ([bool]([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
     }
-}
 
-# Function to install a module if it is not installed
-function Install-ModuleIfNotInstalled {
-    param (
-        [string]$ModuleName
-    )
-    if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
-        Write-Host "Installing module $ModuleName"
-        Install-Module -Name $ModuleName -Force -Confirm:$false
+    # Function to restart the script with elevated privileges if not running as Admin
+    function Elevate-Script {
+        if (-not (Test-Admin)) {
+            $arguments = "& '" + $myinvocation.mycommand.definition + "'"
+            Start-Process powershell -ArgumentList $arguments -Verb RunAs
+            exit
+        }
+    }
+
+    # Function to install a module if it is not installed
+    function Install-ModuleIfNotInstalled {
+        param (
+            [string]$ModuleName
+        )
+        if (-not (Get-Module -ListAvailable -Name $ModuleName)) {
+            Write-Host "Installing module $ModuleName"
+            Install-Module -Name $ModuleName -Force -Confirm:$false
+        } else {
+            Write-Host "Module $ModuleName is already installed"
+        }
+    }
+
+    # Main script execution
+    Elevate-Script
+
+    # Check if running in PowerShell 7+
+    $PSVersion = $PSVersionTable.PSVersion.Major
+    if ($PSVersion -ge 7) {
+        # List of required modules
+        $modules = @("WindowsCompatibility")
+
+        foreach ($module in $modules) {
+            Install-ModuleIfNotInstalled -ModuleName $module
+        }
+
+        # Load ActiveDirectory using WindowsCompatibility
+        if (-not (Get-Module -Name ActiveDirectory)) {
+            Write-Host "Loading ActiveDirectory module using WindowsCompatibility"
+            Import-WinModule -Name ActiveDirectory
+        }
     } else {
-        Write-Host "Module $ModuleName is already installed"
+        Write-Host "This script only runs in PowerShell 7+."
     }
-}
-
-# Main script execution
-Elevate-Script
-
-# Check if running in PowerShell 7+
-$PSVersion = $PSVersionTable.PSVersion.Major
-if ($PSVersion -ge 7) {
-    # List of required modules
-    $modules = @("WindowsCompatibility", "ActiveDirectory", "ImportExcel")
-
-    foreach ($module in $modules) {
-        Install-ModuleIfNotInstalled -ModuleName $module
-    }
-} else {
-    Write-Host "This script only runs in PowerShell 7+."
-}
 
 Connect-MgGraph -TenantID 20e27700-b670-4553-a27c-d8e2583b3289 -NoWelcome
 
@@ -92,22 +98,22 @@ $Inconsistencies | Export-CSV $excelFile -NoTypeInformation
 
 }  
 
-# $Matches | Export-Excel -Path $excelFile `
-#     -AutoSize `
-#     -AutoFilter `
-#     -BoldTopRow `
-#     -FreezeTopRow `
-#     -TableStyle 'Medium6' `
-#     -Title "Intune Stale DeviceID Report" `
-#     -WorksheetName "Matches" `
-#     -TitleBold
+$Matches | Export-Excel -Path $excelFile `
+    -AutoSize `
+    -AutoFilter `
+    -BoldTopRow `
+    -FreezeTopRow `
+    -TableStyle 'Medium6' `
+    -Title "Intune Stale DeviceID Report" `
+    -WorksheetName "Matches" `
+    -TitleBold
 
-# $Inconsistencies | Export-Excel -Path $excelFile `
-#     -AutoSize `
-#     -AutoFilter `
-#     -BoldTopRow `
-#     -FreezeTopRow `
-#     -TableStyle 'Medium6' `
-#     -Title "Intune Stale DeviceID Report" `
-#     -WorksheetName "Inconsistencies" `
-#     -TitleBold
+$Inconsistencies | Export-Excel -Path $excelFile `
+    -AutoSize `
+    -AutoFilter `
+    -BoldTopRow `
+    -FreezeTopRow `
+    -TableStyle 'Medium6' `
+    -Title "Intune Stale DeviceID Report" `
+    -WorksheetName "Inconsistencies" `
+    -TitleBold

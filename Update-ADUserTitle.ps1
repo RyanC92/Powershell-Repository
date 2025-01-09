@@ -3,7 +3,8 @@
 Import-module activedirectory
 $OU = Read-Host "Please enter the OU that you want to work on" 
 Write-host "You Selected OU - $OU" -ForegroundColor yellow -BackgroundColor Darkgreen
-$Users = Get-aduser -filter * -Searchbase "$OU" -properties Title, Description | Select Name, Samaccountname, Description, Title
+# $Users = Get-aduser -filter * -Searchbase "$OU" -properties Title, Description | Select Name, Samaccountname, Description, Title, Enabled | Where-object {$_.Enabled -eq $True}
+$users = Get-aduser -Searchbase "$OU" -Filter {Description -notlike "*JV*"} -Properties Description, title
 
 $countChange = 0
 $countSame = 0
@@ -13,12 +14,12 @@ Foreach ($User in $Users){
     if($($User.Description) -ne ($User.Title)){
 
         Write-Host "Updating $($User.Name) from $($User.Description) to $($User.Title). `n" -ForegroundColor Green
-        Set-aduser -identity "$($User.SamAccountName)" -Description $($User.Title) -whatif
+        Set-aduser -identity "$($User.SamAccountName)" -Description $($User.Title) #-whatif
         $countChange++
 
     }else {
 
-        Write-Host "$($User.Name)'s description ($($User.Description)) is accurate to their title ($($User.Title)), No changes have been made. `n" -ForegroundColor Yellow
+        Write-Host "$($User.Name)'s description $($User.Description) is accurate to their title $($User.Title), No changes have been made. `n" -ForegroundColor Yellow
         $countSame++
     
     }
