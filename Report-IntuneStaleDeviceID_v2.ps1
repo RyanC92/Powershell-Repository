@@ -47,8 +47,8 @@ Measure-Command {
     } else {
         Write-Host "This script only runs in PowerShell 7+."
     }
-
-    Connect-MgGraph -TenantID 20e27700-b670-4553-a27c-d8e2583b3289 -NoWelcome
+    $ImpTenantID = Get-Content "C:\Users\rcurran\OneDrive - Turner Construction\Intune\IntuneTenantID.txt"
+    Connect-MgGraph -TenantID "$ImpTenantID" -NoWelcome
 
     # Define the CSV file paths
     $CsvFile = "C:\temp\reports\Intune-StaleDeviceID-$([DateTime]::Now.ToString('MM-dd-yyyy-hh.mm')).csv"
