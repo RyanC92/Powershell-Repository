@@ -168,7 +168,7 @@ Measure-Command {
         else {
             # User exists in CSV but not in AD
             $Results += [PSCustomObject]@{
-                "Display Name"     = "Not Found in AD"
+                "Display Name"     = "Not Found in $ADGroup"
                 "UserPrincipalName" = $UPN
                 "Distinguished Name" = "N/A"
                 "OU"               = "N/A"
