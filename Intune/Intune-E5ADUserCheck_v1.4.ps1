@@ -128,6 +128,15 @@ Measure-Command {
         exit
     }
 
+    if ("DisplayName" -in $CSVHeaders) {
+        $DNColumn = "DisplayName"
+    } elseif ("Display Name" -in $CSVHeaders) {
+        $DNColumn = "Display Name"
+    } else {
+        Write-Host "Error: The CSV file does not contain 'DisplayName' or 'Display Name'. Exiting..." -ForegroundColor Red
+        exit
+    }
+
     Write-Host "Using column '$UPNColumn' for UserPrincipalName comparison." -ForegroundColor Yellow
 
     # Convert AD members to a lookup table for fast matching
@@ -168,7 +177,7 @@ Measure-Command {
         else {
             # User exists in CSV but not in AD
             $Results += [PSCustomObject]@{
-                "Display Name"     = "Not Found in AD"
+                "Display Name"     = $E5User.$DNColumn  # Dynamically reference detected column
                 "UserPrincipalName" = $UPN
                 "Distinguished Name" = "N/A"
                 "OU"               = "N/A"
