@@ -160,8 +160,8 @@ Measure-Command {
                 "UserPrincipalName" = $UPN
                 "Distinguished Name" = $ADUserLookup[$UPN]["DistinguishedName"]
                 "OU"               = $ADUserLookup[$UPN]["UserOU"]
-                "AD"               = $True
-                "E5"               = $True
+                "ADGroup"          = $True
+                "E5 Licensed"      = $True
                 "Cross Match"      = $True
             }
         }
