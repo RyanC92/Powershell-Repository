@@ -169,25 +169,47 @@ Measure-Command {
                 "UserPrincipalName" = $UPN
                 "Distinguished Name" = $ADUserLookup[$UPN]["DistinguishedName"]
                 "OU"               = $ADUserLookup[$UPN]["UserOU"]
-                "AD"               = $True
-                "E5"               = $True
+                "AD User"          = $True
+                "AD Group Member"  = $True
+                "E5 Licensed"      = $True
                 "Cross Match"      = $True
             }
         }
         else {
-            # User exists in CSV but not in AD
-            $Results += [PSCustomObject]@{
-                "Display Name"     = $E5User.$DNColumn  # Dynamically reference detected column
-                "UserPrincipalName" = $UPN
-                "Distinguished Name" = "N/A"
-                "OU"               = "N/A"
-                "AD"               = $False
-                "E5"               = $True
-                "Cross Match"      = $False
+            # User exists in CSV but not in AD Group - Lookup AD for their OU
+            $UserDetails = Get-ADUser -Filter {UserPrincipalName -eq $UPN} -Properties DistinguishedName, DisplayName -ErrorAction SilentlyContinue
+            
+            if ($UserDetails) {
+                # Extract OU from Distinguished Name
+                $ouPattern = "(?<=,OU=)([^,]+)"
+                $ouMatches = [regex]::Matches($UserDetails.DistinguishedName, $ouPattern)
+                $UserOU = if ($ouMatches.Count -ge 2) { $ouMatches[1].Value } else { "Unknown OU" }
+        
+                $Results += [PSCustomObject]@{
+                    "Display Name"       = $UserDetails.DisplayName
+                    "UserPrincipalName"  = $UPN
+                    "Distinguished Name" = $UserDetails.DistinguishedName
+                    "OU"                 = $UserOU
+                    "AD User"            = $True
+                    "AD Group Member"    = $False
+                    "E5 Licensed"        = $True
+                    "Cross Match"        = $False
+                }
+            } else {
+                # User is not found in AD at all
+                $Results += [PSCustomObject]@{
+                    "Display Name"       = "Not Found in AD"
+                    "UserPrincipalName"  = $UPN
+                    "Distinguished Name" = "N/A"
+                    "OU"                 = "N/A"
+                    "AD User"            = $False
+                    "AD Group Member"    = $False
+                    "E5 Licensed"        = $True
+                    "Cross Match"        = $False
+                }
             }
         }
-    }
-
+}
     # Define the CSV report file path with timestamp
     $Timestamp = Get-Date -Format "MM-dd-yyyy-HH.mm"
     $ReportFile = "C:\temp\reports\AD-Intune-Comparison-$Timestamp.csv"
