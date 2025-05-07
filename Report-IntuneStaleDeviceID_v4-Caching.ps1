@@ -32,17 +32,11 @@ Measure-Command {
     # Check if running in PowerShell 7+
     $PSVersion = $PSVersionTable.PSVersion.Major
     if ($PSVersion -ge 7) {
-        # List of required modules
-        $modules = @("WindowsCompatibility")
 
-        foreach ($module in $modules) {
-            Install-ModuleIfNotInstalled -ModuleName $module
-        }
-
-        # Load ActiveDirectory using WindowsCompatibility
+        # Load ActiveDirectory
         if (-not (Get-Module -Name ActiveDirectory)) {
-            Write-Host "Loading ActiveDirectory module using WindowsCompatibility"
-            Import-WinModule -Name ActiveDirectory
+            Write-Host "Loading ActiveDirectory module"
+            Import-Module -Name ActiveDirectory
         }
     } else {
         Write-Host "This script only runs in PowerShell 7+."
@@ -80,7 +74,7 @@ Measure-Command {
         $MSDev = Get-MGDevice -Filter "DisplayName eq '$($PC.Name)'" | Select DisplayName, DeviceID
         foreach ($Dev in $MSDev) {
             if ($Dev.DeviceID -eq $PC.ObjectGUID) {
-                Write-Host "$i. Device $($PC.Name) with GUID $($PC.ObjectGUID) matches a DeviceID $($Dev.DeviceID) in Intune." -ForegroundColor Green
+                Write-Host "$i. Device $($PC.Name) with GUID $($PC.ObjectGUID) matches Device ($Dev.Displayname) with DeviceID $($Dev.DeviceID) in Intune." -ForegroundColor Green
                 
                 # Create a PSCustomObject to export properly with Cross Match as $True
                 $matchEntry = [PSCustomObject]@{
@@ -92,7 +86,7 @@ Measure-Command {
                 # Add to CSVFile
                 $matchEntry | Export-csv $CsvFile -NoTypeinformation -Append
             } elseif ($Dev.DeviceID -ne $PC.ObjectGUID) {
-                Write-Host "$i. Device $($PC.Name) with GUID $($PC.ObjectGUID) does not match a DeviceID $($Dev.DeviceID) in Intune." -ForegroundColor Red
+                Write-Host "$i. Device $($PC.Name) with GUID $($PC.ObjectGUID) does not match Device $($Dev.DisplayName) with DeviceID $($Dev.DeviceID) in Intune." -ForegroundColor Red
                 
                 # Create a PSCustomObject to export properly with Cross Match as $False
                 $matchEntry = [PSCustomObject]@{
