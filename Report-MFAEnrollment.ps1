@@ -1,4 +1,11 @@
-import-module importexcel
+if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
+    Write-Host "ImportExcel module not found. Installing..."
+    Install-Module -Name ImportExcel -Scope CurrentUser -Force
+} else {
+    Write-Host "ImportExcel module is already installed."
+}
+
+Import-Module ImportExcel
 import-module activedirectory
 
 $OUS = @(
