@@ -45,7 +45,7 @@ if (Test-Path $logFailure) {
 if ($RetryList -and (Test-Path $RetryList)) {
     $computers = Get-Content $RetryList
 } else {
-    $computers = Get-ADComputer -SearchBase "${OU}" -Filter {Enabled -eq $True} | Select-Object -ExpandProperty Name
+    $computers = Get-ADComputer -SearchBase "$OU" -Filter {Enabled -eq $True} | Select-Object -ExpandProperty Name
 }
 
 Write-Host "Found $($computers.Count) computers to process."
