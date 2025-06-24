@@ -146,3 +146,25 @@ Set-Msoluserpassword -UserPrincipalName $User -NewPassword $Password -ForceChang
 function Unlock-ADuser{
 
 }#>
+
+function Get-NextNJOLAPHostname {
+    param(
+        [string]$OU = "OU=Computers,OU=New Jersey,OU=North East,OU=Offices,DC=tcco,DC=org",
+        [string]$Prefix = "NJOLAP",
+        [int]$Start = 1,
+        [int]$End = 1000
+    )
+
+    Import-Module ActiveDirectory
+
+    $existing = Get-ADComputer -SearchBase $OU -Filter "Name -like '$Prefix*'" | Select-Object -ExpandProperty Name
+
+    for ($i = $Start; $i -le $End; $i++) {
+        $hostname = "{0}{1:D4}" -f $Prefix, $i
+        if ($hostname -notin $existing) {
+            return $hostname
+        }
+    }
+    Write-Warning "No available hostname found in range."
+    return $null
+}

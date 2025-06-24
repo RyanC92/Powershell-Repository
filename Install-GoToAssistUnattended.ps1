@@ -20,25 +20,24 @@ Import-Module ActiveDirectory
 
 # Define installer and task parameters
 $installerSourcePath = "C:\Temp\Installers\GoToAssist_Remote_Support_Unattended.msi"
+if (-not (Test-Path $installerSourcePath)) {
+    Write-Warning "Installer not found at $installerSourcePath."
+    Write-Warning "Please ensure the GoToAssist installer (GoToAssist_Remote_Support_Unattended.msi) is present at this path before running the script."
+    exit 1
+}
 $installerRemotePath = "C:\Temp\GoToAssist_Remote_Support_Unattended.msi"
 $taskName = "InstallGoToAssist"
 $command = "msiexec /i `"$installerRemotePath`" /qn"
 
 # Output paths
 $logSuccess = "C:\Temp\InstallLogs\GoToAssist_Install_Success-${Location}.log"
-$logFailure = "C:\Temp\InstallLogs\GoToAssist_Install_Failures-${Location}.log"
+
 
 # Read and deduplicate success log
 $alreadyCompleted = @()
 if (Test-Path $logSuccess) {
     $alreadyCompleted = Get-Content $logSuccess | Where-Object { $_.Trim() -ne "" } | Sort-Object -Unique
     Set-Content -Path $logSuccess -Value $alreadyCompleted
-}
-
-# Read and deduplicate failure log
-if (Test-Path $logFailure) {
-    $failures = Get-Content $logFailure | Where-Object { $_.Trim() -ne "" } | Sort-Object -Unique
-    Set-Content -Path $logFailure -Value $failures
 }
 
 # Get list of computers
@@ -64,8 +63,7 @@ foreach ($remotePC in $computers) {
     Write-Host "Processing $remotePC..."
 
     if (!(Test-Connection -ComputerName $remotePC -Count 1 -Quiet)) {
-        Write-Warning "$remotePC is unreachable. Logging as failure."
-        Add-Content -Path $logFailure -Value $remotePC
+        Write-Warning "$remotePC is unreachable. Skipping. Please check network connectivity."
         continue
     }
 
@@ -73,8 +71,7 @@ foreach ($remotePC in $computers) {
     try {
         Copy-Item -Path $installerSourcePath -Destination "\\$remotePC\C$\Temp\GoToAssist_Remote_Support_Unattended.msi" -Force
     } catch {
-        Write-Warning "Failed to copy installer to $remotePC. Logging as failure."
-        Add-Content -Path $logFailure -Value $remotePC
+        Write-Warning "Failed to copy installer to $remotePC. Error: $_"
         continue
     }
 
@@ -85,7 +82,7 @@ foreach ($remotePC in $computers) {
         Write-Host "${remotePC}: Install task created and launched."
         Add-Content -Path $logSuccess -Value $remotePC
     } catch {
-        Write-Warning "Failed to create/run task on $remotePC. Logging as failure."
-        Add-Content -Path $logFailure -Value $remotePC
+        Write-Warning "Failed to create/run task on $remotePC. Error: $_"
+
     }
 }
