@@ -20,13 +20,17 @@ Foreach ($OU in $OUs){
     
     Foreach ($Comp in $Comps){
         
-        $LAPS = Get-AdmPwdPassword $($Comp.Name)
+        $LAPS = Get-LapsADPassword -Identity $($Comp.Name)
+        $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($LAPS.Password)
+        $PlainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($BSTR)
+        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($BSTR)
+
         $BitlockerKey = Get-ADObject -Filter 'objectClass -eq "msFVE-RecoveryInformation"' -SearchBase $Comp.DistinguishedName -Properties whenCreated, msFVE-RecoveryPassword | `
         Sort whenCreated -Descending | Select whenCreated, msFVE-RecoveryPassword | Select-Object -First 1
         $ARRAY += [PSCustomObject]@{
             ComputerName = $LAPS.ComputerName
             DistinguishedName = $LAPS.DistinguishedName
-            Password = $LAPS.Password
+            Password = $PlainPassword
             ExpirationTimeStamp = $LAPS.ExpirationTimeStamp
             'BitlockerKey Created' = $BitlockerKey.whenCreated
             'BitlockerKey' = $($BitlockerKey.'msFVE-RecoveryPassword')
