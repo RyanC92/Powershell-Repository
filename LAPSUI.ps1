@@ -135,30 +135,86 @@ Expiration: $($result.ExpirationTimestamp)
     }
 })
 
-# Add event handler for Apply button
+# Add event handler for Apply button (robust schema detection)
 $ApplyButton.Add_Click({
+    Import-Module ActiveDirectory -ErrorAction SilentlyContinue | Out-Null
+    Import-Module LAPS -ErrorAction SilentlyContinue | Out-Null  # If Windows LAPS is present
+
     $ComputerName = $ComputerNameBox.Text.Trim()
-    $NewDate = $NewExpirationPicker.SelectedDate
+    $sel = $NewExpirationPicker.SelectedDate  # $null or [datetime]
 
     if ([string]::IsNullOrWhiteSpace($ComputerName)) {
         [System.Windows.MessageBox]::Show("Please enter a computer name before applying expiration.", "Validation Error", "OK", "Warning")
         return
     }
-
-    if (-not $NewDate) {
+    if ($null -eq $sel) {
         [System.Windows.MessageBox]::Show("Please select a new expiration date.", "Validation Error", "OK", "Warning")
         return
     }
 
-    try {
-        # Assuming you have the RSAT module or equivalent for Set-LapsADPasswordExpiration
-        Set-LapsADPasswordExpiration -Identity $ComputerName -ExpirationTime $NewDate -ErrorAction Stop
+    # Use end-of-day LOCAL time to avoid 'already past' after UTC conversion
+    $pickedLocal   = [datetime]$sel
+    $localDateTime = $pickedLocal.Date.AddHours(23).AddMinutes(59)
 
-        [System.Windows.MessageBox]::Show("New expiration applied successfully.", "Success", "OK", "Information")
+    if ($localDateTime.Kind -eq [System.DateTimeKind]::Unspecified) {
+        $localDateTime = [datetime]::SpecifyKind($localDateTime, [System.DateTimeKind]::Local)
+    }
+    if ($localDateTime -lt (Get-Date)) {
+        [System.Windows.MessageBox]::Show("The selected expiration is in the past. Please pick a future date.", "Validation Error", "OK", "Warning")
+        return
+    }
+
+    $utcWhen    = $localDateTime.ToUniversalTime()
+    $shownLocal = [System.TimeZoneInfo]::ConvertTimeFromUtc($utcWhen, [System.TimeZoneInfo]::Local)
+
+    try {
+        # Pull ALL properties, then test which names exist (no schema errors)
+        $comp  = Get-ADComputer -Identity $ComputerName -Properties * -ErrorAction Stop
+        $names = $comp.PSObject.Properties.Name
+
+        $hasWinSchema   = ($names -contains 'msLAPS-PasswordExpirationTime') -or ($names -contains 'msLAPS-EncryptedPassword')
+        $hasLegacySchema= ($names -contains 'ms-Mcs-AdmPwdExpirationTime') -or ($names -contains 'ms-Mcs-AdmPwd')
+        $hasWinCmd      = [bool](Get-Command Set-LapsADPasswordExpirationTime -ErrorAction SilentlyContinue)
+
+        if ($hasWinSchema -and $hasWinCmd) {
+            # Windows LAPS path
+            Set-LapsADPasswordExpirationTime -Identity $ComputerName -WhenEffective $utcWhen -ErrorAction Stop
+            [System.Windows.MessageBox]::Show("New expiration applied (Windows LAPS).`nEffective: $shownLocal (local time)", "Success", "OK", "Information")
+        }
+        elseif ($hasLegacySchema) {
+            # Legacy LAPS path (write Integer8/FILETIME)
+            $fileTime = $utcWhen.ToFileTimeUtc()
+            Set-ADComputer -Identity $ComputerName -Replace @{ 'ms-Mcs-AdmPwdExpirationTime' = $fileTime } -ErrorAction Stop
+            [System.Windows.MessageBox]::Show("New expiration applied (Legacy LAPS).`nEffective: $shownLocal (local time)", "Success", "OK", "Information")
+        }
+        else {
+            # Fallback: try Windows LAPS first (if cmdlet present), else legacy write; surface errors if both fail
+            $did = $false
+            if ($hasWinCmd) {
+                try {
+                    Set-LapsADPasswordExpirationTime -Identity $ComputerName -WhenEffective $utcWhen -ErrorAction Stop
+                    [System.Windows.MessageBox]::Show("New expiration applied (Windows LAPS).`nEffective: $shownLocal (local time)", "Success", "OK", "Information")
+                    $did = $true
+                } catch {}
+            }
+            if (-not $did) {
+                try {
+                    $fileTime = $utcWhen.ToFileTimeUtc()
+                    Set-ADComputer -Identity $ComputerName -Replace @{ 'ms-Mcs-AdmPwdExpirationTime' = $fileTime } -ErrorAction Stop
+                    [System.Windows.MessageBox]::Show("New expiration applied (Legacy LAPS).`nEffective: $shownLocal (local time)", "Success", "OK", "Information")
+                    $did = $true
+                } catch {}
+            }
+            if (-not $did) {
+                throw "Neither Windows LAPS nor Legacy LAPS attribute could be written. Verify schema/policies and permissions."
+            }
+        }
     } catch {
         [System.Windows.MessageBox]::Show("Failed to set new expiration.`n`n$_", "Error", "OK", "Error")
     }
 })
+
+
 
 $AboutButton.Add_Click({
     [System.Windows.MessageBox]::Show(

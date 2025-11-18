@@ -11,7 +11,7 @@ $countSame = 0
 
 Foreach ($User in $Users){
 
-    if($($User.Description) -ne ($User.Title)){
+    if(($($User.Description) -ne ($User.Title)) -and ($User.Title) -ne $Null){
 
         Write-Host "Updating $($User.Name) from $($User.Description) to $($User.Title). `n" -ForegroundColor Green
         Set-aduser -identity "$($User.SamAccountName)" -Description $($User.Title) #-whatif

@@ -1,4 +1,19 @@
-import-module activedirectory -UseWindowsPowershell
+if ($PSVersionTable.PSVersion.Major -eq 5) {
+    # Windows PowerShell 5.1
+    Import-Module ActiveDirectory
+}
+elseif ($PSVersionTable.PSVersion.Major -ge 7) {
+    # PowerShell 7+
+    try {
+        # Try native load first
+        Import-Module ActiveDirectory -SkipEditionCheck -ErrorAction Stop
+    } catch {
+        Write-Warning "Native load failed. Falling back to compatibility mode."
+        Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction SilentlyContinue
+    }
+}
+
+
 
 CD C:\Powershell-Repository
 
